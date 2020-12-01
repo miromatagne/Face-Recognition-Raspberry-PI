@@ -36,8 +36,8 @@ def get_matches(im, known_encodings):
         if matches[match_id]:
             # TODO replace following with something we can use to
             # find id (dictionnary, ...)
-            name = fileList[matchId]
-            print(name)
+            # name = fileList[matchId]
+            # print(name)
             y1, x2, y2, x1 = faceLocation
             y1, x2, y2, x1 = y1*4, x2*4, y2*4, x1*4
             cv2.rectangle(im, (x1, y1), (x2, y2), (255, 0, 0), 2)
