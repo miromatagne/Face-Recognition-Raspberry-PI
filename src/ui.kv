@@ -1,0 +1,33 @@
+ #:kivy 1.11.1
+
+WindowManager:
+    MainWindow:
+    SecondWindow:
+
+<MainWindow>:
+    name:"Main"
+    
+    GridLayout:
+        cols:1
+
+        GridLayout:
+            cols:2
+
+            Label:
+                text:"Text1"
+            
+            Label:
+                text:"Text2"
+
+        Button:
+            text:"Submit"
+            on_release: 
+                app.root.current = "Second"
+
+<SecondWindow>:
+    name:"Second"
+
+    Button:
+        text:"Go Back"
+        on_release: 
+            app.root.current = "Main"
