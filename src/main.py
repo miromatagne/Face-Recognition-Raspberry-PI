@@ -2,8 +2,12 @@ import kivy
 from kivy.app import App
 from kivy.uix.label import Label
 from kivy.uix.screenmanager import Screen, ScreenManager
+from kivy.uix.camera import Camera
 from kivy.lang import Builder
-
+import cv2
+import numpy as np
+import faces
+    
 
 class MainWindow(Screen):
     pass

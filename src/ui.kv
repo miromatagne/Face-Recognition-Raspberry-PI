@@ -6,23 +6,38 @@ WindowManager:
 
 <MainWindow>:
     name:"Main"
+	id: main
     
     GridLayout:
         cols:1
 
-        GridLayout:
-            cols:2
+    	Camera:
+            id: camera
+            play: True
 
-            Label:
-                text:"Text1"
-            
-            Label:
-                text:"Text2"
+		GridLayout:
+			cols:3		
 
-        Button:
-            text:"Submit"
-            on_release: 
-                app.root.current = "Second"
+		    Button:
+		        text:"Register"
+				size_hint_y: None	
+				height: '48dp'
+		        on_release: 
+		            print(camera.texture.pixels)
+
+			Button:
+		        text:"Guest"
+				size_hint_y: None
+				height: '48dp'
+		        on_release: 
+		            app.root.current = "Second"
+
+			Button:
+		        text:"Problem ?"
+				size_hint_y: None
+				height: '48dp'
+		        on_release: 
+		            app.root.current = "Second"
 
 <SecondWindow>:
     name:"Second"
