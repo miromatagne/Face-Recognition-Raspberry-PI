@@ -23,7 +23,7 @@ WindowManager:
 				size_hint_y: None	
 				height: '48dp'
 		        on_release: 
-		            print(camera.texture.pixels)
+		            self.parent.parent.parent.printPixels(camera)
 
 			Button:
 		        text:"Guest"
