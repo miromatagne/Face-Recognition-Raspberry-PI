@@ -30,8 +30,11 @@ for f in fileList:
 def find_encodings(images):
     encodings = []
     for im in images:
+        im = cv2.resize(im, (0, 0), None, 0.25, 0.25)
         im = cv2.cvtColor(im, cv2.COLOR_BGR2RGB)
-        encode = face_recognition.face_encodings(im)[0]
+        encodeList = face_recognition.face_encodings(im)
+        if(len(encodeList) != 0):
+            encode = encodeList[0]
         encodings.append(encode)
     return encodings
 
@@ -81,11 +84,16 @@ class MainWindow(Screen):
             if matches[matchId]:
                 name = fileList[matchId]
                 print(name)
+                y1, x2, y2, x1 = faceLocation
+                y1, x2, y2, x1 = y1*4, x2*4, y2*4, x1*4
+                cv2.rectangle(frame, (x1, y1), (x2, y2), (0,0,255,255), 4)
+                cv2.rectangle(frame, (x1, y2-35), (x2, y2), (0, 0, 255,255), cv2.FILLED)
+                cv2.putText(img=frame, text=name.split(".")[0], org=(x1+6, y2-6),fontFace=cv2.FONT_HERSHEY_COMPLEX , fontScale=1, color=[255,255,255,255], lineType=cv2.LINE_AA, thickness=2)
                 
         window_shape = Window.size
         window_width = window_shape[0]
         window_height = window_shape[1]
-        frame = cv2.resize(frame, (int(window_height * (self.cam.texture.size[1]/self.cam.texture.size[0])), window_height))
+        frame = cv2.resize(frame, (int(window_height * (self.cam.texture.size[0]/self.cam.texture.size[1])), window_height))
         frame = frame.reshape((frame.shape[1],frame.shape[0], 4))
         buf = frame.tobytes()
         texture = Texture.create(size=(frame.shape[0], frame.shape[1]), colorfmt='rgba')
