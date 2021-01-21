@@ -5,42 +5,46 @@ from kivy.uix.gridlayout import GridLayout
 from kivy.uix.screenmanager import Screen, ScreenManager
 from kivy.uix.camera import Camera
 from kivy.uix.image import Image
+from kivy.uix.popup import Popup
 from kivy.uix.button import Button
 from kivy.lang import Builder
 import cv2
 import face_recognition
 from picamera import PiCamera
 import os
+import pickle
 import numpy as np
-import faces
+from faces import find_encodings,get_matches
 from kivy.clock import Clock
 from kivy.graphics.texture import Texture
 from kivy.core.window import Window
 
+data = pickle.loads(open("encodings.pickle", "rb").read())
+names = data["names"]
+knownEncodings = data["encodings"]
+
 
 path = '/home/pi/Desktop/proj-h402-face-recognition/testImages'
 fileList = os.listdir(path)
-images = []
+newImages = []
+newNames = []
 
 for f in fileList:
-    currentImg = cv2.imread(path + "/" + f)
-    images.append(currentImg)
+    if(f not in names):
+        currentImg = cv2.imread(path + "/" + f)
+        newImages.append(currentImg)
+        newNames.append(f)
 
+if len(newImages) != 0:
+    newEncodings = find_encodings(newImages)
+    for e,n in zip(newEncodings,newNames):
+        knownEncodings.append(e)
+        names.append(n)
 
-def find_encodings(images):
-    encodings = []
-    for im in images:
-        im = cv2.resize(im, (0, 0), None, 0.25, 0.25)
-        im = cv2.cvtColor(im, cv2.COLOR_BGR2RGB)
-        encodeList = face_recognition.face_encodings(im)
-        if(len(encodeList) != 0):
-            encode = encodeList[0]
-        encodings.append(encode)
-    return encodings
-
-print(len(images))
-knownEncodings = find_encodings(images)
-print(knownEncodings)
+    data = {"encodings": knownEncodings,"names": names}
+    f = open("encodings.pickle", "wb")
+    f.write(pickle.dumps(data))
+    f.close()
 
 
 class MainWindow(Screen):
@@ -62,34 +66,31 @@ class MainWindow(Screen):
         subgrid.add_widget(problemButton)
         grid.add_widget(subgrid)
         self.add_widget(grid)
-        
+        self.popup = Popup(title='Welcome !',content=Label(text='Hello world'),auto_dismiss=False,size_hint=(.8, .8))
+        self.popupIsOpen = False
         self.cam = Camera(play=True)
-        
         Clock.schedule_interval(self.update_texture, 1.0 / 60.0)
     
     def update_texture(self,instance):
+        """
+            Updates the live camera stream and calls the face recognition
+            functions. Draws squares around recognized faces and opens
+            the popup when a face has been recognized.
+        """
         frame = np.frombuffer(self.cam.texture.pixels,np.uint8)
         frame = frame.reshape((self.cam.texture.size[1],self.cam.texture.size[0],4))
-        resizedImage = cv2.resize(frame, (0, 0), None, 0.25, 0.25)
-        resizedImage = cv2.cvtColor(resizedImage, cv2.COLOR_BGR2RGB)
-        webcamFaces = face_recognition.face_locations(resizedImage)
-        webcamEncoding = face_recognition.face_encodings(resizedImage, webcamFaces)
-
-        for encodedFace, faceLocation in zip(webcamEncoding, webcamFaces):
-            print("OK1")
-            matches = face_recognition.compare_faces(knownEncodings, encodedFace)
-            faceDistances = face_recognition.face_distance(knownEncodings, encodedFace)       
-            matchId = np.argmin(faceDistances)
-
-            if matches[matchId]:
-                name = fileList[matchId]
-                print(name)
-                y1, x2, y2, x1 = faceLocation
-                y1, x2, y2, x1 = y1*4, x2*4, y2*4, x1*4
-                cv2.rectangle(frame, (x1, y1), (x2, y2), (0,0,255,255), 4)
-                cv2.rectangle(frame, (x1, y2-35), (x2, y2), (0, 0, 255,255), cv2.FILLED)
-                cv2.putText(img=frame, text=name.split(".")[0], org=(x1+6, y2-6),fontFace=cv2.FONT_HERSHEY_COMPLEX , fontScale=1, color=[255,255,255,255], lineType=cv2.LINE_AA, thickness=2)
-                
+        frame,names = get_matches(frame,knownEncodings,fileList)
+        
+        if len(names) != 0 and not self.popupIsOpen:
+            popupText = "Welcome "
+            for n in names:
+                popupText += n + ' '
+            popupText += '!'
+            self.popup.content = Label(text=popupText)
+            self.popupIsOpen = True
+            self.popup.open()
+            Clock.schedule_once(self.close_popup, 2)
+        
         window_shape = Window.size
         window_width = window_shape[0]
         window_height = window_shape[1]
@@ -100,6 +101,13 @@ class MainWindow(Screen):
         texture.blit_buffer(buf, colorfmt='rgba', bufferfmt='ubyte')
         texture.flip_vertical()
         self.img.texture = texture
+        
+    def close_popup(self,instance):
+        """
+            Closes the popup
+        """
+        self.popup.dismiss()
+        self.popupIsOpen = False
 
 
 class SecondWindow(Screen):
