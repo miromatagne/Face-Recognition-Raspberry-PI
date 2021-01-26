@@ -111,6 +111,7 @@ class MainWindow(Screen):
         self.popupIsOpen = False
         
     def switch_screen(self,instance,screen):
+        Clock.unschedule(self.update_texture)
         self.parent.current = screen
 
 
@@ -155,19 +156,19 @@ class RegisterPhotoWindow(Screen):
         self.img = Image(pos_hint={'center_x': 0.5, 'center_y': 0.5})
         grid.add_widget(self.img)
         subgrid = GridLayout(cols=3)
-        registerButton = Button(text="RegisterPhoto",size_hint_y=None,height='48dp')
-        guestButton = Button(text="Guest",size_hint_y=None,height='48dp')
-        problemButton = Button(text="Problem ?",size_hint_y=None,height='48dp')
-        registerButton.bind(on_press=lambda x:self.switch_screen(self,"RegisterInfo"))
-        guestButton.bind(on_press=lambda x:print("OK"))
-        problemButton.bind(on_press=lambda x:print("OK"))
-        subgrid.add_widget(registerButton)
-        subgrid.add_widget(guestButton)
-        subgrid.add_widget(problemButton)
+        cancelButton = Button(text="Cancel",size_hint_y=None,height='48dp')
+        cancelButton.bind(on_press=lambda x:self.switch_screen(self,"RegisterInfo"))
+        photoButton = Button(text="Go",size_hint_y=None,height='48dp')
+        photoButton.bind(on_press=self.start_capture)
+        self.countdownText = Label(text="5")
+        subgrid.add_widget(self.countdownText)
+        subgrid.add_widget(cancelButton)
+        subgrid.add_widget(photoButton)
         grid.add_widget(subgrid)
         self.add_widget(grid)
         self.cam = cam
         Clock.schedule_interval(self.update_texture, 1.0 / 60.0)
+        
         
     def update_texture(self,instance):
         """
@@ -175,9 +176,16 @@ class RegisterPhotoWindow(Screen):
             functions. Draws squares around recognized faces and opens
             the popup when a face has been recognized.
         """
+            
         frame = np.frombuffer(self.cam.texture.pixels,np.uint8)
         frame = frame.reshape((self.cam.texture.size[1],self.cam.texture.size[0],4))
         frame,encodings = get_faces_frame(frame)
+        if(self.countdownText.text.isnumeric() and int(self.countdownText.text) == 0):
+            self.countdownText.text = "Done !"
+            if(len(encodings) > 0):
+                print(encodings[0]) #Encoding of the person wanting to register
+            else:
+                print("No face")
         
         window_shape = Window.size
         window_width = window_shape[0]
@@ -189,6 +197,16 @@ class RegisterPhotoWindow(Screen):
         texture.blit_buffer(buf, colorfmt='rgba', bufferfmt='ubyte')
         texture.flip_vertical()
         self.img.texture = texture
+        
+    def decrement_countdown(self,instance):
+        self.countdownText.text = str(int(self.countdownText.text) - 1)
+        
+    def start_capture(self,instance):
+        Clock.schedule_once(self.decrement_countdown,1)
+        Clock.schedule_once(self.decrement_countdown,2)
+        Clock.schedule_once(self.decrement_countdown,3)
+        Clock.schedule_once(self.decrement_countdown,4)
+        Clock.schedule_once(self.decrement_countdown,5)
 
 
 class Program(App):
