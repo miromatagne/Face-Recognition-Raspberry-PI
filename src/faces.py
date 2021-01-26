@@ -19,12 +19,22 @@ def find_encodings(images):
     return encodings
 
 
-def get_matches(frame, knownEncodings,fileList):
-    # Returns the identities of the people recognized on an image
+def get_faces(frame):
+    """
+        Returns the faces of the people recognized on an image
+    """
     resizedImage = cv2.resize(frame, (0, 0), None, 0.25, 0.25)
     resizedImage = cv2.cvtColor(resizedImage, cv2.COLOR_BGR2RGB)
     webcamFaces = face_recognition.face_locations(resizedImage)
     webcamEncoding = face_recognition.face_encodings(resizedImage, webcamFaces)
+    return webcamEncoding,webcamFaces
+
+
+def get_matches(frame, knownEncodings,fileList):
+    """
+        Returns the identities of the people recognized on an image
+    """
+    webcamEncoding,webcamFaces = get_faces(frame)
     names = []
 
     for encodedFace, faceLocation in zip(webcamEncoding, webcamFaces):
@@ -42,3 +52,15 @@ def get_matches(frame, knownEncodings,fileList):
             cv2.putText(img=frame, text=name.split(".")[0], org=(x1+6, y2-6),fontFace=cv2.FONT_HERSHEY_COMPLEX , fontScale=1, color=[255,255,255,255], lineType=cv2.LINE_AA, thickness=2)
     
     return frame,names
+
+def get_faces_frame(frame):
+    """
+        Returns a frame with squares around all faces
+    """
+    webcamEncoding,webcamFaces = get_faces(frame)
+    if len(webcamFaces) > 0:
+        y1, x2, y2, x1 = webcamFaces[0]
+        y1, x2, y2, x1 = y1*4, x2*4, y2*4, x1*4
+        cv2.rectangle(frame, (x1, y1), (x2, y2), (0,0,255,255), 4)
+    return frame,webcamEncoding
+

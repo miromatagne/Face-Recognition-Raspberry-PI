@@ -4,6 +4,7 @@ from kivy.uix.label import Label
 from kivy.uix.gridlayout import GridLayout
 from kivy.uix.screenmanager import Screen, ScreenManager
 from kivy.uix.camera import Camera
+from kivy.uix.textinput import TextInput
 from kivy.uix.image import Image
 from kivy.uix.popup import Popup
 from kivy.uix.button import Button
@@ -14,7 +15,7 @@ from picamera import PiCamera
 import os
 import pickle
 import numpy as np
-from faces import find_encodings,get_matches
+from faces import find_encodings,get_matches,get_faces_frame
 from kivy.clock import Clock
 from kivy.graphics.texture import Texture
 from kivy.core.window import Window
@@ -48,7 +49,7 @@ if len(newImages) != 0:
 
 
 class MainWindow(Screen):
-    def __init__(self,**kwargs):
+    def __init__(self,cam,**kwargs):
         super(MainWindow, self).__init__(**kwargs)
         self.name = "Main"
         grid = GridLayout(cols=1)
@@ -58,7 +59,7 @@ class MainWindow(Screen):
         registerButton = Button(text="Register",size_hint_y=None,height='48dp')
         guestButton = Button(text="Guest",size_hint_y=None,height='48dp')
         problemButton = Button(text="Problem ?",size_hint_y=None,height='48dp')
-        registerButton.bind(on_press=lambda x:print("OK"))
+        registerButton.bind(on_press=lambda x:self.switch_screen(self,"RegisterInfo"))
         guestButton.bind(on_press=lambda x:print("OK"))
         problemButton.bind(on_press=lambda x:print("OK"))
         subgrid.add_widget(registerButton)
@@ -68,7 +69,7 @@ class MainWindow(Screen):
         self.add_widget(grid)
         self.popup = Popup(title='Welcome !',content=Label(text='Hello world'),auto_dismiss=False,size_hint=(.8, .8))
         self.popupIsOpen = False
-        self.cam = Camera(play=True)
+        self.cam = cam
         Clock.schedule_interval(self.update_texture, 1.0 / 60.0)
     
     def update_texture(self,instance):
@@ -108,18 +109,95 @@ class MainWindow(Screen):
         """
         self.popup.dismiss()
         self.popupIsOpen = False
+        
+    def switch_screen(self,instance,screen):
+        self.parent.current = screen
 
 
-class SecondWindow(Screen):
-    pass
+class RegisterInfoWindow(Screen):
+    def __init__(self,**kwargs):
+        super(RegisterInfoWindow, self).__init__(**kwargs)
+        self.name = "RegisterInfo"
+        grid = GridLayout(cols=1)
+        nameLabel = Label(text="Name :")
+        nameInput=TextInput(multiline=False)
+        grid.add_widget(nameLabel)
+        grid.add_widget(nameInput)
+        telephoneLabel = Label(text="Telephone :")
+        telephoneInput=TextInput(multiline=False)
+        grid.add_widget(telephoneLabel)
+        grid.add_widget(telephoneInput)
+        emailLabel = Label(text="Email :")
+        emailInput=TextInput(multiline=False)
+        grid.add_widget(emailLabel)
+        grid.add_widget(emailInput)
+        subgrid = GridLayout(cols=2)
+        confirmButton = Button(text="Confirm",size_hint_y=None,height='48dp')
+        cancelButton = Button(text="Cancel",size_hint_y=None,height='48dp')
+        confirmButton.bind(on_press=lambda x:self.switch_screen(self,"RegisterPhoto"))
+        cancelButton.bind(on_press=lambda x:print("OK"))
+        subgrid.add_widget(confirmButton)
+        subgrid.add_widget(cancelButton)
+        grid.add_widget(subgrid)
+        self.add_widget(grid)
+        self.popup = Popup(title='Welcome !',content=Label(text='Hello world'),auto_dismiss=False,size_hint=(.8, .8))
+        self.popupIsOpen = False
+        
+    def switch_screen(self,instance,screen):
+        self.parent.current = screen
 
+
+class RegisterPhotoWindow(Screen):
+    def __init__(self,cam,**kwargs):
+        super(RegisterPhotoWindow, self).__init__(**kwargs)
+        self.name = "RegisterPhoto"
+        grid = GridLayout(cols=1)
+        self.img = Image(pos_hint={'center_x': 0.5, 'center_y': 0.5})
+        grid.add_widget(self.img)
+        subgrid = GridLayout(cols=3)
+        registerButton = Button(text="RegisterPhoto",size_hint_y=None,height='48dp')
+        guestButton = Button(text="Guest",size_hint_y=None,height='48dp')
+        problemButton = Button(text="Problem ?",size_hint_y=None,height='48dp')
+        registerButton.bind(on_press=lambda x:self.switch_screen(self,"RegisterInfo"))
+        guestButton.bind(on_press=lambda x:print("OK"))
+        problemButton.bind(on_press=lambda x:print("OK"))
+        subgrid.add_widget(registerButton)
+        subgrid.add_widget(guestButton)
+        subgrid.add_widget(problemButton)
+        grid.add_widget(subgrid)
+        self.add_widget(grid)
+        self.cam = cam
+        Clock.schedule_interval(self.update_texture, 1.0 / 60.0)
+        
+    def update_texture(self,instance):
+        """
+            Updates the live camera stream and calls the face recognition
+            functions. Draws squares around recognized faces and opens
+            the popup when a face has been recognized.
+        """
+        frame = np.frombuffer(self.cam.texture.pixels,np.uint8)
+        frame = frame.reshape((self.cam.texture.size[1],self.cam.texture.size[0],4))
+        frame,encodings = get_faces_frame(frame)
+        
+        window_shape = Window.size
+        window_width = window_shape[0]
+        window_height = window_shape[1]
+        frame = cv2.resize(frame, (int(window_height * (self.cam.texture.size[0]/self.cam.texture.size[1])), window_height))
+        frame = frame.reshape((frame.shape[1],frame.shape[0], 4))
+        buf = frame.tobytes()
+        texture = Texture.create(size=(frame.shape[0], frame.shape[1]), colorfmt='rgba')
+        texture.blit_buffer(buf, colorfmt='rgba', bufferfmt='ubyte')
+        texture.flip_vertical()
+        self.img.texture = texture
 
 
 class Program(App):
     def build(self):
+        self.cam = Camera(play=True)
         sm = ScreenManager()
-        sm.add_widget(MainWindow())
-        sm.add_widget(SecondWindow())
+        sm.add_widget(MainWindow(self.cam))
+        sm.add_widget(RegisterInfoWindow())
+        sm.add_widget(RegisterPhotoWindow(self.cam))
         return sm
 
 
