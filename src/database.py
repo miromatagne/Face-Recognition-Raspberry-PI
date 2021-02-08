@@ -8,10 +8,8 @@ db = cluster["proj-h-402"]
 collection = db["Users"]
 
 
-def post_to_db():
-    post = {"name": "Miro", "age": 20,
-            "photo": "https://storage.cloud.google.com/verylonguniquebucketname/Images/Miro1.JPG"}
-
+def post_to_db(name,telephone,email,encoding):
+    post = {"name": name, "telephone": telephone, "email": email, "encoding":encoding}
     collection.insert_one(post)
 
 
@@ -26,5 +24,3 @@ def get_documents():
     for doc in documents:
         user_pictures[doc["_id"]]
 
-
-add_image()

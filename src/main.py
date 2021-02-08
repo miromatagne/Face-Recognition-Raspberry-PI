@@ -16,14 +16,15 @@ import os
 import pickle
 import numpy as np
 from faces import find_encodings,get_matches,get_faces_frame
+from database import post_to_db
 from kivy.clock import Clock
 from kivy.graphics.texture import Texture
 from kivy.core.window import Window
 
+
 data = pickle.loads(open("encodings.pickle", "rb").read())
 names = data["names"]
 knownEncodings = data["encodings"]
-
 
 path = '/home/pi/Desktop/proj-h402-face-recognition/testImages'
 fileList = os.listdir(path)
@@ -60,7 +61,7 @@ class MainWindow(Screen):
         guestButton = Button(text="Guest",size_hint_y=None,height='48dp')
         problemButton = Button(text="Problem ?",size_hint_y=None,height='48dp')
         registerButton.bind(on_press=lambda x:self.switch_screen(self,"RegisterInfo"))
-        guestButton.bind(on_press=lambda x:print("OK"))
+        guestButton.bind(on_press=lambda x:self.switch_screen(self,"Guest"))
         problemButton.bind(on_press=lambda x:print("OK"))
         subgrid.add_widget(registerButton)
         subgrid.add_widget(guestButton)
@@ -121,17 +122,17 @@ class RegisterInfoWindow(Screen):
         self.name = "RegisterInfo"
         grid = GridLayout(cols=1)
         nameLabel = Label(text="Name :")
-        nameInput=TextInput(multiline=False)
+        self.nameInput=TextInput(multiline=False)
         grid.add_widget(nameLabel)
-        grid.add_widget(nameInput)
+        grid.add_widget(self.nameInput)
         telephoneLabel = Label(text="Telephone :")
-        telephoneInput=TextInput(multiline=False)
+        self.telephoneInput=TextInput(multiline=False)
         grid.add_widget(telephoneLabel)
-        grid.add_widget(telephoneInput)
+        grid.add_widget(self.telephoneInput)
         emailLabel = Label(text="Email :")
-        emailInput=TextInput(multiline=False)
+        self.emailInput=TextInput(multiline=False)
         grid.add_widget(emailLabel)
-        grid.add_widget(emailInput)
+        grid.add_widget(self.emailInput)
         subgrid = GridLayout(cols=2)
         confirmButton = Button(text="Confirm",size_hint_y=None,height='48dp')
         cancelButton = Button(text="Cancel",size_hint_y=None,height='48dp')
@@ -183,10 +184,10 @@ class RegisterPhotoWindow(Screen):
         if(self.countdownText.text.isnumeric() and int(self.countdownText.text) == 0):
             self.countdownText.text = "Done !"
             if(len(encodings) > 0):
-                print(encodings[0]) #Encoding of the person wanting to register
+                post_to_db(self.parent.get_screen("RegisterInfo").nameInput.text,self.parent.get_screen("RegisterInfo").telephoneInput.text,self.parent.get_screen("RegisterInfo").emailInput.text,encodings[0].tolist())
             else:
                 print("No face")
-        
+            
         window_shape = Window.size
         window_width = window_shape[0]
         window_height = window_shape[1]
@@ -208,6 +209,33 @@ class RegisterPhotoWindow(Screen):
         Clock.schedule_once(self.decrement_countdown,4)
         Clock.schedule_once(self.decrement_countdown,5)
 
+class GuestWindow(Screen):
+    def __init__(self,**kwargs):
+        super(GuestWindow, self).__init__(**kwargs)
+        self.name = "Guest"
+        grid = GridLayout(cols=1)
+        nameLabel = Label(text="Name :")
+        nameInput=TextInput(multiline=False)
+        grid.add_widget(nameLabel)
+        grid.add_widget(nameInput)
+        telephoneLabel = Label(text="Telephone :")
+        telephoneInput=TextInput(multiline=False)
+        grid.add_widget(telephoneLabel)
+        grid.add_widget(telephoneInput)
+        emailLabel = Label(text="Email :")
+        emailInput=TextInput(multiline=False)
+        grid.add_widget(emailLabel)
+        grid.add_widget(emailInput)
+        subgrid = GridLayout(cols=2)
+        confirmButton = Button(text="Confirm",size_hint_y=None,height='48dp')
+        cancelButton = Button(text="Cancel",size_hint_y=None,height='48dp')
+        confirmButton.bind(on_press=lambda x:print("Guest registered"))
+        cancelButton.bind(on_press=lambda x:print("OK"))
+        subgrid.add_widget(confirmButton)
+        subgrid.add_widget(cancelButton)
+        grid.add_widget(subgrid)
+        self.add_widget(grid)
+        
 
 class Program(App):
     def build(self):
@@ -216,6 +244,8 @@ class Program(App):
         sm.add_widget(MainWindow(self.cam))
         sm.add_widget(RegisterInfoWindow())
         sm.add_widget(RegisterPhotoWindow(self.cam))
+        sm.add_widget(GuestWindow())
+        #sm.add_widget(ProblemWindow(self.cam))
         return sm
 
 

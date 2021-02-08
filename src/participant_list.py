@@ -33,8 +33,8 @@ def get_date_column(values):
             excel_date = cell
             dt = datetime.fromordinal(
                 datetime(1900, 1, 1).toordinal() + excel_date - 2)
-            today = datetime.today()
-            #today = datetime(2020, 9, 10)
+            #today = datetime.today()
+            today = datetime(2020, 9, 10)
             if(today.date() == dt.date()):
                 return get_excel_column_name(i+1)
     return None
