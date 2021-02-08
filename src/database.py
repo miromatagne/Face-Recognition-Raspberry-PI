@@ -20,8 +20,6 @@ def add_image():
 
 def get_documents():
     documents = collection.find({})
-    user_pictures = {}
-    for doc in documents:
-        user_pictures[doc["_id"]]
+    return documents
 
 

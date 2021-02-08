@@ -16,12 +16,12 @@ import os
 import pickle
 import numpy as np
 from faces import find_encodings,get_matches,get_faces_frame
-from database import post_to_db
+from database import post_to_db,get_documents
 from kivy.clock import Clock
 from kivy.graphics.texture import Texture
 from kivy.core.window import Window
 
-
+"""
 data = pickle.loads(open("encodings.pickle", "rb").read())
 names = data["names"]
 knownEncodings = data["encodings"]
@@ -47,7 +47,17 @@ if len(newImages) != 0:
     f = open("encodings.pickle", "wb")
     f.write(pickle.dumps(data))
     f.close()
+"""
+    
+docs = get_documents()
+knownEncodings = []
+users = []
+for d in docs:
+    knownEncodings.append(d["encoding"])
+    users.append({"_id":str(d["_id"]),"name":d["name"],"telehpone":d["telephone"],"email":d["email"]})
 
+print(knownEncodings)
+print(users)
 
 class MainWindow(Screen):
     def __init__(self,cam,**kwargs):
@@ -81,7 +91,7 @@ class MainWindow(Screen):
         """
         frame = np.frombuffer(self.cam.texture.pixels,np.uint8)
         frame = frame.reshape((self.cam.texture.size[1],self.cam.texture.size[0],4))
-        frame,names = get_matches(frame,knownEncodings,fileList)
+        frame,names = get_matches(frame,knownEncodings,users)
         
         if len(names) != 0 and not self.popupIsOpen:
             popupText = "Welcome "

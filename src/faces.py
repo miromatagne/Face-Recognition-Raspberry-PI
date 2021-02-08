@@ -2,7 +2,7 @@ import cv2
 import face_recognition
 import numpy as np
 
-
+recognizedFaces = []
 
 def find_encodings(images):
     """
@@ -30,7 +30,7 @@ def get_faces(frame):
     return webcamEncoding,webcamFaces
 
 
-def get_matches(frame, knownEncodings,fileList):
+def get_matches(frame,knownEncodings,users):
     """
         Returns the identities of the people recognized on an image
     """
@@ -43,13 +43,16 @@ def get_matches(frame, knownEncodings,fileList):
         matchId = np.argmin(faceDistances)
 
         if matches[matchId]:
-            name = fileList[matchId]
-            names.append(name)
+            name = users[matchId]["name"]
+            if users[matchId]["_id"] not in recognizedFaces:
+                names.append(name)
+                recognizedFaces.append(users[matchId]["_id"])
+                
             y1, x2, y2, x1 = faceLocation
             y1, x2, y2, x1 = y1*4, x2*4, y2*4, x1*4
             cv2.rectangle(frame, (x1, y1), (x2, y2), (0,0,255,255), 4)
             cv2.rectangle(frame, (x1, y2-35), (x2, y2), (0, 0, 255,255), cv2.FILLED)
-            cv2.putText(img=frame, text=name.split(".")[0], org=(x1+6, y2-6),fontFace=cv2.FONT_HERSHEY_COMPLEX , fontScale=1, color=[255,255,255,255], lineType=cv2.LINE_AA, thickness=2)
+            cv2.putText(img=frame, text=name, org=(x1+6, y2-6),fontFace=cv2.FONT_HERSHEY_COMPLEX , fontScale=1, color=[255,255,255,255], lineType=cv2.LINE_AA, thickness=2)
     
     return frame,names
 
