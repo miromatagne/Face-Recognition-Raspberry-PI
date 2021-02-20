@@ -17,6 +17,7 @@ import pickle
 import numpy as np
 from faces import find_encodings,get_matches,get_faces_frame
 from database import post_to_db,get_documents
+from participant_list import add_user,get_sheet_content,write_presence
 from kivy.clock import Clock
 from kivy.graphics.texture import Texture
 from kivy.core.window import Window
@@ -56,8 +57,7 @@ for d in docs:
     knownEncodings.append(d["encoding"])
     users.append({"_id":str(d["_id"]),"name":d["name"],"telehpone":d["telephone"],"email":d["email"]})
 
-print(knownEncodings)
-print(users)
+values = get_sheet_content()
 
 class MainWindow(Screen):
     def __init__(self,cam,**kwargs):
@@ -91,16 +91,18 @@ class MainWindow(Screen):
         """
         frame = np.frombuffer(self.cam.texture.pixels,np.uint8)
         frame = frame.reshape((self.cam.texture.size[1],self.cam.texture.size[0],4))
-        frame,names = get_matches(frame,knownEncodings,users)
+        frame,recognizedUsers = get_matches(frame,knownEncodings,users)
         
-        if len(names) != 0 and not self.popupIsOpen:
+        if len(recognizedUsers) != 0 and not self.popupIsOpen:
             popupText = "Welcome "
-            for n in names:
-                popupText += n + ' '
+            for n in recognizedUsers:
+                popupText += n["name"] + ' '
             popupText += '!'
             self.popup.content = Label(text=popupText)
             self.popupIsOpen = True
             self.popup.open()
+            for n in recognizedUsers:
+                write_presence(values,n["_id"])
             Clock.schedule_once(self.close_popup, 2)
         
         window_shape = Window.size
@@ -194,7 +196,8 @@ class RegisterPhotoWindow(Screen):
         if(self.countdownText.text.isnumeric() and int(self.countdownText.text) == 0):
             self.countdownText.text = "Done !"
             if(len(encodings) > 0):
-                post_to_db(self.parent.get_screen("RegisterInfo").nameInput.text,self.parent.get_screen("RegisterInfo").telephoneInput.text,self.parent.get_screen("RegisterInfo").emailInput.text,encodings[0].tolist())
+                new_user_id = post_to_db(self.parent.get_screen("RegisterInfo").nameInput.text,self.parent.get_screen("RegisterInfo").telephoneInput.text,self.parent.get_screen("RegisterInfo").emailInput.text,encodings[0].tolist())
+                add_user(self.parent.get_screen("RegisterInfo").nameInput.text,new_user_id)
             else:
                 print("No face")
             

@@ -3,14 +3,15 @@ from bson.objectid import ObjectId
 
 # TODO: change URL and cluster name
 cluster = MongoClient(
-    "mongodb+srv://miromatagne:Mmm2000(@proj-h-402.zpee0.mongodb.net/<dbname>?retryWrites=true&w=majority")
-db = cluster["proj-h-402"]
+    "mongodb+srv://attendance:mysvu4-toxnox-Ramdic@attendance.yxtwy.mongodb.net/Attendance?retryWrites=true&w=majority")
+db = cluster["Attendance"]
 collection = db["Users"]
 
 
 def post_to_db(name,telephone,email,encoding):
     post = {"name": name, "telephone": telephone, "email": email, "encoding":encoding}
-    collection.insert_one(post)
+    id = collection.insert_one(post)
+    return id.inserted_id
 
 
 def add_image():

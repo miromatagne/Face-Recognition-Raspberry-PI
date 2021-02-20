@@ -3,7 +3,7 @@ from googleapiclient.discovery import build
 from datetime import datetime
 
 SCOPES = ['https://www.googleapis.com/auth/spreadsheets']
-SERVICE_ACCOUNT_FILE = 'keys.json'
+SERVICE_ACCOUNT_FILE = '../keys.json'
 
 credentials = service_account.Credentials.from_service_account_file(
     SERVICE_ACCOUNT_FILE, scopes=SCOPES)
@@ -33,11 +33,11 @@ def get_date_column(values):
             excel_date = cell
             dt = datetime.fromordinal(
                 datetime(1900, 1, 1).toordinal() + excel_date - 2)
-            #today = datetime.today()
-            today = datetime(2020, 9, 10)
+            today = datetime.today()
+            #today = datetime(2020, 9, 16)
             if(today.date() == dt.date()):
                 return get_excel_column_name(i+1)
-    return None
+    return write_new_column(values)
 
 
 def get_id_row(values, id):
@@ -54,6 +54,32 @@ def write_presence(values, id):
         request = sheet.values().update(spreadsheetId=SAMPLE_SPREADSHEET_ID, valueInputOption="USER_ENTERED",
                                         range="2016-2020!"+str(column)+str(row), body={"values": [["X"]]}).execute()
 
+def add_user(name,id):
+    #values = get_sheet_content()
+    #nbRows = len(values)
+    request = sheet.values().append(spreadsheetId=SAMPLE_SPREADSHEET_ID, valueInputOption="USER_ENTERED",
+                                        range="2016-2020", body={"values": [[name,'',str(id)]]}).execute()
 
-values = get_sheet_content()
-write_presence(values, 'testid')
+def write_new_column(values):
+    nbRow = 2
+    maxList = max(values, key = lambda i: len(i)) 
+    nbCol = get_excel_column_name(len(maxList) + 1)
+    today = datetime.today()
+    #date = today
+    date = today.strftime("%m/%d/%Y")
+    body = {
+    "requests": [
+        {
+        "appendDimension": {
+            "sheetId": 1849052962,
+            "dimension": "COLUMNS",
+            "length": 1
+            }
+        }
+    ]
+    }
+    request = service.spreadsheets().batchUpdate(spreadsheetId=SAMPLE_SPREADSHEET_ID, body=body).execute()
+    request = sheet.values().update(spreadsheetId=SAMPLE_SPREADSHEET_ID, valueInputOption="USER_ENTERED",
+                                        range="2016-2020!"+str(nbCol)+str(nbRow), body={"values": [[date]]}).execute()
+
+    return nbCol

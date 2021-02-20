@@ -35,26 +35,27 @@ def get_matches(frame,knownEncodings,users):
         Returns the identities of the people recognized on an image
     """
     webcamEncoding,webcamFaces = get_faces(frame)
-    names = []
+    recognizedUsers = []
 
     for encodedFace, faceLocation in zip(webcamEncoding, webcamFaces):
         matches = face_recognition.compare_faces(knownEncodings, encodedFace)
-        faceDistances = face_recognition.face_distance(knownEncodings, encodedFace)       
-        matchId = np.argmin(faceDistances)
+        faceDistances = face_recognition.face_distance(knownEncodings, encodedFace)
+        
+        if len(faceDistances) > 0:
+            matchId = np.argmin(faceDistances)
 
-        if matches[matchId]:
-            name = users[matchId]["name"]
-            if users[matchId]["_id"] not in recognizedFaces:
-                names.append(name)
-                recognizedFaces.append(users[matchId]["_id"])
-                
-            y1, x2, y2, x1 = faceLocation
-            y1, x2, y2, x1 = y1*4, x2*4, y2*4, x1*4
-            cv2.rectangle(frame, (x1, y1), (x2, y2), (0,0,255,255), 4)
-            cv2.rectangle(frame, (x1, y2-35), (x2, y2), (0, 0, 255,255), cv2.FILLED)
-            cv2.putText(img=frame, text=name, org=(x1+6, y2-6),fontFace=cv2.FONT_HERSHEY_COMPLEX , fontScale=1, color=[255,255,255,255], lineType=cv2.LINE_AA, thickness=2)
-    
-    return frame,names
+            if matches[matchId]:
+                if users[matchId]["_id"] not in recognizedFaces:
+                    recognizedUsers.append(users[matchId])
+                    recognizedFaces.append(users[matchId]["_id"])
+                    
+                y1, x2, y2, x1 = faceLocation
+                y1, x2, y2, x1 = y1*4, x2*4, y2*4, x1*4
+                cv2.rectangle(frame, (x1, y1), (x2, y2), (0,0,255,255), 4)
+                cv2.rectangle(frame, (x1, y2-35), (x2, y2), (0, 0, 255,255), cv2.FILLED)
+                cv2.putText(img=frame, text=users[matchId]["name"], org=(x1+6, y2-6),fontFace=cv2.FONT_HERSHEY_COMPLEX , fontScale=1, color=[255,255,255,255], lineType=cv2.LINE_AA, thickness=2)
+        
+    return frame,recognizedUsers
 
 def get_faces_frame(frame):
     """
