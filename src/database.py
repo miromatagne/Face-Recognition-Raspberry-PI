@@ -8,15 +8,10 @@ db = cluster["Attendance"]
 collection = db["Users"]
 
 
-def post_to_db(name,telephone,email,encoding):
-    post = {"name": name, "telephone": telephone, "email": email, "encoding":encoding}
+def post_to_db(firstName,lastName,dob,telephone,email,rank,encoding):
+    post = {"firstName": firstName, "lastName": lastName, "dob": dob, "telephone": telephone, "email": email, "rank": rank, "encoding":encoding}
     id = collection.insert_one(post)
     return id.inserted_id
-
-
-def add_image():
-    collection.update_one({"_id": ObjectId("5fc61ba448f61a6793b485cf")}, {'$push': {
-        'photos': "https://media.resources.festicket.com/www/artists/KendrickLamar_New.jpg"}})
 
 
 def get_documents():

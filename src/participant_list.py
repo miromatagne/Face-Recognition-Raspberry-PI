@@ -47,6 +47,13 @@ def get_id_row(values, id):
     return None
 
 
+def get_name_row(values, firstName, lastName):
+    for i in range(len(values)):
+        if(values[i][0] == firstName and values[i][1] == lastName):
+            return i+1
+    return None
+
+
 def write_presence(values, id):
     column = get_date_column(values)
     row = get_id_row(values, id)
@@ -54,11 +61,19 @@ def write_presence(values, id):
         request = sheet.values().update(spreadsheetId=SAMPLE_SPREADSHEET_ID, valueInputOption="USER_ENTERED",
                                         range="2016-2020!"+str(column)+str(row), body={"values": [["X"]]}).execute()
 
-def add_user(name,id):
+def write_presence_from_name(values, firstName, lastName):
+    column = get_date_column(values)
+    row = get_name_row(values, firstName,lastName)
+    if row is not None and column is not None:
+        request = sheet.values().update(spreadsheetId=SAMPLE_SPREADSHEET_ID, valueInputOption="USER_ENTERED",
+                                        range="2016-2020!"+str(column)+str(row), body={"values": [["X"]]}).execute()
+
+
+def add_user(firstName,lastName,dob,telephone,email,rank,id):
     #values = get_sheet_content()
     #nbRows = len(values)
     request = sheet.values().append(spreadsheetId=SAMPLE_SPREADSHEET_ID, valueInputOption="USER_ENTERED",
-                                        range="2016-2020", body={"values": [[name,'',str(id)]]}).execute()
+                                        range="2016-2020", body={"values": [[firstName,lastName,str(id),'',telephone,email,dob,'','',rank]]}).execute()
 
 def write_new_column(values):
     nbRow = 2

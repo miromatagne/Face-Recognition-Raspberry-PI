@@ -8,6 +8,8 @@ from kivy.uix.textinput import TextInput
 from kivy.uix.image import Image
 from kivy.uix.popup import Popup
 from kivy.uix.button import Button
+from kivy.uix.dropdown import DropDown
+from kivy.uix.scrollview import ScrollView
 from kivy.lang import Builder
 import cv2
 import face_recognition
@@ -17,10 +19,11 @@ import pickle
 import numpy as np
 from faces import find_encodings,get_matches,get_faces_frame
 from database import post_to_db,get_documents
-from participant_list import add_user,get_sheet_content,write_presence
+from participant_list import add_user,get_sheet_content,write_presence,write_presence_from_name
 from kivy.clock import Clock
 from kivy.graphics.texture import Texture
 from kivy.core.window import Window
+import time
 
 """
 data = pickle.loads(open("encodings.pickle", "rb").read())
@@ -49,15 +52,24 @@ if len(newImages) != 0:
     f.write(pickle.dumps(data))
     f.close()
 """
-    
+  
 docs = get_documents()
 knownEncodings = []
 users = []
 for d in docs:
     knownEncodings.append(d["encoding"])
-    users.append({"_id":str(d["_id"]),"name":d["name"],"telehpone":d["telephone"],"email":d["email"]})
+    users.append({"_id":str(d["_id"]),"name":d["firstName"],"telehpone":d["telephone"],"email":d["email"]})
 
 values = get_sheet_content()
+
+"""
+for i in range(500,5000):
+    encoding = np.random.uniform(low=-1,high=1,size=(128,))
+    new_user_id = post_to_db("Miro" + str(i),"Test","21/03/2000","0467534184","mirotest@gmail.com","black",encoding.tolist())
+    add_user("Miro" + str(i),"Test","21/03/2000","0467534184","mirotest@gmail.com","black",new_user_id)
+    if i % 55 == 0:
+        time.sleep(61)
+"""
 
 class MainWindow(Screen):
     def __init__(self,cam,**kwargs):
@@ -69,12 +81,13 @@ class MainWindow(Screen):
         subgrid = GridLayout(cols=3)
         registerButton = Button(text="Register",size_hint_y=None,height='48dp')
         guestButton = Button(text="Guest",size_hint_y=None,height='48dp')
+        alreadyMemberButton = Button(text="Already a member ?",size_hint_y=None,height='48dp')
         problemButton = Button(text="Problem ?",size_hint_y=None,height='48dp')
         registerButton.bind(on_press=lambda x:self.switch_screen(self,"RegisterInfo"))
-        guestButton.bind(on_press=lambda x:self.switch_screen(self,"Guest"))
-        problemButton.bind(on_press=lambda x:print("OK"))
+        alreadyMemberButton.bind(on_press=lambda x:self.switch_screen(self,"AlreadyMember"))
+        problemButton.bind(on_press=lambda x:self.switch_screen(self,"Problem"))
         subgrid.add_widget(registerButton)
-        subgrid.add_widget(guestButton)
+        subgrid.add_widget(alreadyMemberButton)
         subgrid.add_widget(problemButton)
         grid.add_widget(subgrid)
         self.add_widget(grid)
@@ -132,30 +145,59 @@ class RegisterInfoWindow(Screen):
     def __init__(self,**kwargs):
         super(RegisterInfoWindow, self).__init__(**kwargs)
         self.name = "RegisterInfo"
-        grid = GridLayout(cols=1)
-        nameLabel = Label(text="Name :")
-        self.nameInput=TextInput(multiline=False)
-        grid.add_widget(nameLabel)
-        grid.add_widget(self.nameInput)
+        grid = GridLayout(cols=2)
+        
+        #First name
+        firstNameLabel = Label(text="First name :")
+        self.firstNameInput=TextInput(multiline=False)
+        grid.add_widget(firstNameLabel)
+        grid.add_widget(self.firstNameInput)
+        
+        #Last name
+        lastNameLabel = Label(text="Last name :")
+        self.lastNameInput=TextInput(multiline=False)
+        grid.add_widget(lastNameLabel)
+        grid.add_widget(self.lastNameInput)
+        
+        #Date of birth
+        dobLabel = Label(text="Date of Birth :")
+        self.dobInput=TextInput(multiline=False)
+        grid.add_widget(dobLabel)
+        grid.add_widget(self.dobInput)
+        
+        #Telephone
         telephoneLabel = Label(text="Telephone :")
         self.telephoneInput=TextInput(multiline=False)
         grid.add_widget(telephoneLabel)
         grid.add_widget(self.telephoneInput)
+        
+        #Email
         emailLabel = Label(text="Email :")
         self.emailInput=TextInput(multiline=False)
         grid.add_widget(emailLabel)
         grid.add_widget(self.emailInput)
-        subgrid = GridLayout(cols=2)
+        
+        #Belt
+        beltLabel = Label(text="Belt :")
+        self.beltDropdown = DropDown()
+        ranks = ["white","blue","purple","brown","black"]
+        for i in range(len(ranks)):
+            btn = Button(text=ranks[i], size_hint_y=None, height=44,on_release=lambda btn: self.beltDropdown.select(btn.text))
+            self.beltDropdown.add_widget(btn)
+        self.beltButton = Button(text="Belt rank",size_hint=(None, None))
+        self.beltButton.bind(on_release=self.beltDropdown.open)
+        self.beltDropdown.bind(on_select=lambda instance, x: setattr(self.beltButton, 'text', x))
+        grid.add_widget(beltLabel)
+        grid.add_widget(self.beltButton)
+        
         confirmButton = Button(text="Confirm",size_hint_y=None,height='48dp')
         cancelButton = Button(text="Cancel",size_hint_y=None,height='48dp')
         confirmButton.bind(on_press=lambda x:self.switch_screen(self,"RegisterPhoto"))
-        cancelButton.bind(on_press=lambda x:print("OK"))
-        subgrid.add_widget(confirmButton)
-        subgrid.add_widget(cancelButton)
-        grid.add_widget(subgrid)
+        cancelButton.bind(on_press=lambda x:print(self.beltButton.text))
+        grid.add_widget(confirmButton)
+        grid.add_widget(cancelButton)
+        
         self.add_widget(grid)
-        self.popup = Popup(title='Welcome !',content=Label(text='Hello world'),auto_dismiss=False,size_hint=(.8, .8))
-        self.popupIsOpen = False
         
     def switch_screen(self,instance,screen):
         self.parent.current = screen
@@ -196,8 +238,8 @@ class RegisterPhotoWindow(Screen):
         if(self.countdownText.text.isnumeric() and int(self.countdownText.text) == 0):
             self.countdownText.text = "Done !"
             if(len(encodings) > 0):
-                new_user_id = post_to_db(self.parent.get_screen("RegisterInfo").nameInput.text,self.parent.get_screen("RegisterInfo").telephoneInput.text,self.parent.get_screen("RegisterInfo").emailInput.text,encodings[0].tolist())
-                add_user(self.parent.get_screen("RegisterInfo").nameInput.text,new_user_id)
+                new_user_id = post_to_db(self.parent.get_screen("RegisterInfo").firstNameInput.text,self.parent.get_screen("RegisterInfo").lastNameInput.text,self.parent.get_screen("RegisterInfo").dobInput.text,self.parent.get_screen("RegisterInfo").telephoneInput.text,self.parent.get_screen("RegisterInfo").emailInput.text,self.parent.get_screen("RegisterInfo").beltButton.text,encodings[0].tolist())
+                add_user(self.parent.get_screen("RegisterInfo").firstNameInput.text,self.parent.get_screen("RegisterInfo").lastNameInput.text,self.parent.get_screen("RegisterInfo").dobInput.text,self.parent.get_screen("RegisterInfo").telephoneInput.text,self.parent.get_screen("RegisterInfo").emailInput.text,self.parent.get_screen("RegisterInfo").beltButton.text,new_user_id)
             else:
                 print("No face")
             
@@ -221,33 +263,77 @@ class RegisterPhotoWindow(Screen):
         Clock.schedule_once(self.decrement_countdown,3)
         Clock.schedule_once(self.decrement_countdown,4)
         Clock.schedule_once(self.decrement_countdown,5)
+        
 
-class GuestWindow(Screen):
+class ProblemWindow(Screen):
     def __init__(self,**kwargs):
-        super(GuestWindow, self).__init__(**kwargs)
-        self.name = "Guest"
-        grid = GridLayout(cols=1)
-        nameLabel = Label(text="Name :")
-        nameInput=TextInput(multiline=False)
-        grid.add_widget(nameLabel)
-        grid.add_widget(nameInput)
-        telephoneLabel = Label(text="Telephone :")
-        telephoneInput=TextInput(multiline=False)
-        grid.add_widget(telephoneLabel)
-        grid.add_widget(telephoneInput)
-        emailLabel = Label(text="Email :")
-        emailInput=TextInput(multiline=False)
-        grid.add_widget(emailLabel)
-        grid.add_widget(emailInput)
-        subgrid = GridLayout(cols=2)
+        super(ProblemWindow, self).__init__(**kwargs)
+        self.name = "Problem"
+        grid = GridLayout(cols=2)
+        
+        #First name
+        firstNameLabel = Label(text="First name :")
+        self.firstNameInput=TextInput(multiline=False)
+        grid.add_widget(firstNameLabel)
+        grid.add_widget(self.firstNameInput)
+        
+        #Last name
+        lastNameLabel = Label(text="Last name :")
+        self.lastNameInput=TextInput(multiline=False)
+        grid.add_widget(lastNameLabel)
+        grid.add_widget(self.lastNameInput)
+        
         confirmButton = Button(text="Confirm",size_hint_y=None,height='48dp')
         cancelButton = Button(text="Cancel",size_hint_y=None,height='48dp')
-        confirmButton.bind(on_press=lambda x:print("Guest registered"))
-        cancelButton.bind(on_press=lambda x:print("OK"))
-        subgrid.add_widget(confirmButton)
-        subgrid.add_widget(cancelButton)
-        grid.add_widget(subgrid)
+        confirmButton.bind(on_press=lambda x:write_presence_from_name(values,self.firstNameInput.text,self.lastNameInput.text))
+        cancelButton.bind(on_press=lambda x:self.switch_screen(self,"Main"))
+        grid.add_widget(confirmButton)
+        grid.add_widget(cancelButton)
+        
         self.add_widget(grid)
+        
+    def switch_screen(self,instance,screen):
+        self.parent.current = screen
+        
+
+class AlreadyMemberWindow(Screen):
+    def __init__(self,**kwargs):
+        super(AlreadyMemberWindow, self).__init__(**kwargs)
+        self.name = "AlreadyMember"
+        self.grid = GridLayout(cols=2)
+        
+        #First name
+        nameLabel = Label(text="Name :")
+        self.nameInput=TextInput(multiline=False)
+        self.nameInput.bind(text=lambda x,y:self.update_list(self))
+        self.grid.add_widget(nameLabel)
+        self.grid.add_widget(self.nameInput)
+
+        
+        confirmButton = Button(text="Confirm",size_hint_y=None,height='48dp')
+        cancelButton = Button(text="Cancel",size_hint_y=None,height='48dp')
+        confirmButton.bind(on_press=lambda x:self.update_list(self))
+        cancelButton.bind(on_press=lambda x:self.switch_screen(self,"Main"))
+        
+        self.listScroll = ScrollView(size_hint=(1,1))
+        self.grid.add_widget(self.listScroll)
+        
+        self.grid.add_widget(confirmButton)
+        self.grid.add_widget(cancelButton)
+        
+        self.add_widget(self.grid)
+    
+    def update_list(self,instance):
+        self.listScroll.clear_widgets()
+        listGrid = GridLayout(cols=1,spacing=10,size_hint_y=None,height=self.grid.minimum_height)
+        for i in range(len(values)):
+            name = values[i][0] + " " + values[i][1]
+            if self.nameInput.text != "" and self.nameInput.text in name:
+                listGrid.add_widget(Label(text=name))
+        self.listScroll.add_widget(listGrid)
+        
+    def switch_screen(self,instance,screen):
+        self.parent.current = screen
         
 
 class Program(App):
@@ -257,8 +343,8 @@ class Program(App):
         sm.add_widget(MainWindow(self.cam))
         sm.add_widget(RegisterInfoWindow())
         sm.add_widget(RegisterPhotoWindow(self.cam))
-        sm.add_widget(GuestWindow())
-        #sm.add_widget(ProblemWindow(self.cam))
+        sm.add_widget(ProblemWindow())
+        sm.add_widget(AlreadyMemberWindow())
         return sm
 
 
