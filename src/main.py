@@ -325,7 +325,8 @@ class AlreadyMemberWindow(Screen):
     
     def update_list(self,instance):
         self.listScroll.clear_widgets()
-        listGrid = GridLayout(cols=1,spacing=10,size_hint_y=None,height=self.grid.minimum_height)
+        listGrid = GridLayout(cols=1,spacing=10,size_hint_y=None)
+        listGrid.bind(minimum_height=listGrid.setter('height'))
         for i in range(len(values)):
             name = values[i][0] + " " + values[i][1]
             if self.nameInput.text != "" and self.nameInput.text in name:
