@@ -193,13 +193,15 @@ class RegisterInfoWindow(Screen):
         confirmButton = Button(text="Confirm",size_hint_y=None,height='48dp')
         cancelButton = Button(text="Cancel",size_hint_y=None,height='48dp')
         confirmButton.bind(on_press=lambda x:self.switch_screen(self,"RegisterPhoto"))
-        cancelButton.bind(on_press=lambda x:print(self.beltButton.text))
+        cancelButton.bind(on_press=lambda x:self.switch_screen(self,"Main"))
         grid.add_widget(confirmButton)
         grid.add_widget(cancelButton)
         
         self.add_widget(grid)
         
     def switch_screen(self,instance,screen):
+        if screen == "Main":
+            Clock.schedule_interval(self.parent.get_screen('Main').update_texture, 1.0 / 60.0)
         self.parent.current = screen
 
 
@@ -264,6 +266,10 @@ class RegisterPhotoWindow(Screen):
         Clock.schedule_once(self.decrement_countdown,4)
         Clock.schedule_once(self.decrement_countdown,5)
         
+    def switch_screen(self,instance,screen):
+        Clock.unschedule(self.update_texture)
+        self.parent.current = screen
+        
 
 class ProblemWindow(Screen):
     def __init__(self,**kwargs):
@@ -293,6 +299,8 @@ class ProblemWindow(Screen):
         self.add_widget(grid)
         
     def switch_screen(self,instance,screen):
+        if screen == "Main":
+            Clock.schedule_interval(self.parent.get_screen('Main').update_texture, 1.0 / 60.0)
         self.parent.current = screen
         
 
@@ -328,6 +336,7 @@ class AlreadyMemberWindow(Screen):
         self.listScroll.clear_widgets()
         listGrid = GridLayout(cols=1,spacing=10,size_hint_y=None)
         listGrid.bind(minimum_height=listGrid.setter('height'))
+        print(values)
         for i in range(len(values)):
             name = values[i][0] + " " + values[i][1]
             if self.nameInput.text != "" and self.nameInput.text in name:
@@ -337,6 +346,8 @@ class AlreadyMemberWindow(Screen):
         self.listScroll.add_widget(listGrid)
         
     def switch_screen(self,instance,screen):
+        if screen == "Main":
+            Clock.schedule_interval(self.parent.get_screen('Main').update_texture, 1.0 / 60.0)
         self.parent.current = screen
         
     def select_member(self,instance,i):
@@ -417,7 +428,7 @@ class Program(App):
         sm.add_widget(AlreadyMemberWindow())
         sm.add_widget(AlreadyMemberPhotoWindow(self.cam))
         return sm
-
+    
 
 if __name__ == "__main__":
     Program().run()
