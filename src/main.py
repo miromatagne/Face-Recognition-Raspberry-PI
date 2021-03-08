@@ -1,3 +1,5 @@
+import os
+os.environ['KIVY_AUDIO'] = 'sdl2'
 import kivy
 from kivy.app import App
 from kivy.uix.label import Label
@@ -11,6 +13,7 @@ from kivy.uix.button import Button
 from kivy.uix.dropdown import DropDown
 from kivy.uix.scrollview import ScrollView
 from kivy.lang import Builder
+from kivy.core.audio import SoundLoader
 import cv2
 import face_recognition
 from picamera import PiCamera
@@ -114,6 +117,12 @@ class MainWindow(Screen):
             self.popup.content = Label(text=popupText)
             self.popupIsOpen = True
             self.popup.open()
+            sound = SoundLoader.load('ding.wav')
+            if sound:
+                print("Sound found at %s" % sound.source)
+                print("Sound is %.3f seconds" % sound.length)
+                sound.play()
+                sound.seek(0.00)
             for n in recognizedUsers:
                 write_presence(values,n["_id"])
             Clock.schedule_once(self.close_popup, 2)
@@ -139,7 +148,7 @@ class MainWindow(Screen):
     def switch_screen(self,instance,screen):
         Clock.unschedule(self.update_texture)
         self.parent.current = screen
-
+        
 
 class RegisterInfoWindow(Screen):
     def __init__(self,**kwargs):
