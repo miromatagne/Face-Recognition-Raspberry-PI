@@ -27,6 +27,10 @@ from kivy.clock import Clock
 from kivy.graphics.texture import Texture
 from kivy.core.window import Window
 import time
+import info
+
+from main_window import MainWindow
+from register_info_window import RegisterInfoWindow
 
 """
 data = pickle.loads(open("encodings.pickle", "rb").read())
@@ -55,7 +59,7 @@ if len(newImages) != 0:
     f.write(pickle.dumps(data))
     f.close()
 """
-  
+"""  
 docs = get_documents()
 knownEncodings = []
 users = []
@@ -64,7 +68,7 @@ for d in docs:
     users.append({"_id":str(d["_id"]),"name":d["firstName"],"telehpone":d["telephone"],"email":d["email"]})
 
 values = get_sheet_content()
-
+"""
 """
 for i in range(500,5000):
     encoding = np.random.uniform(low=-1,high=1,size=(128,))
@@ -73,145 +77,6 @@ for i in range(500,5000):
     if i % 55 == 0:
         time.sleep(61)
 """
-
-class MainWindow(Screen):
-    def __init__(self,cam,**kwargs):
-        super(MainWindow, self).__init__(**kwargs)
-        self.name = "Main"
-        grid = GridLayout(cols=1)
-        self.img = Image(pos_hint={'center_x': 0.5, 'center_y': 0.5})
-        grid.add_widget(self.img)
-        subgrid = GridLayout(cols=3)
-        registerButton = Button(text="Register",size_hint_y=None,height='48dp')
-        guestButton = Button(text="Guest",size_hint_y=None,height='48dp')
-        alreadyMemberButton = Button(text="Already a member ?",size_hint_y=None,height='48dp')
-        problemButton = Button(text="Problem ?",size_hint_y=None,height='48dp')
-        registerButton.bind(on_press=lambda x:self.switch_screen(self,"RegisterInfo"))
-        alreadyMemberButton.bind(on_press=lambda x:self.switch_screen(self,"AlreadyMember"))
-        problemButton.bind(on_press=lambda x:self.switch_screen(self,"Problem"))
-        subgrid.add_widget(registerButton)
-        subgrid.add_widget(alreadyMemberButton)
-        subgrid.add_widget(problemButton)
-        grid.add_widget(subgrid)
-        self.add_widget(grid)
-        self.popup = Popup(title='Welcome !',content=Label(text='Hello world'),auto_dismiss=False,size_hint=(.8, .8))
-        self.popupIsOpen = False
-        self.cam = cam
-        Clock.schedule_interval(self.update_texture, 1.0 / 60.0)
-    
-    def update_texture(self,instance):
-        """
-            Updates the live camera stream and calls the face recognition
-            functions. Draws squares around recognized faces and opens
-            the popup when a face has been recognized.
-        """
-        frame = np.frombuffer(self.cam.texture.pixels,np.uint8)
-        frame = frame.reshape((self.cam.texture.size[1],self.cam.texture.size[0],4))
-        frame,recognizedUsers = get_matches(frame,knownEncodings,users)
-        
-        if len(recognizedUsers) != 0 and not self.popupIsOpen:
-            popupText = "Welcome "
-            for n in recognizedUsers:
-                popupText += n["name"] + ' '
-            popupText += '!'
-            self.popup.content = Label(text=popupText)
-            self.popupIsOpen = True
-            self.popup.open()
-            sound = SoundLoader.load('ding.wav')
-            if sound:
-                print("Sound found at %s" % sound.source)
-                print("Sound is %.3f seconds" % sound.length)
-                sound.play()
-                sound.seek(0.00)
-            for n in recognizedUsers:
-                write_presence(values,n["_id"])
-            Clock.schedule_once(self.close_popup, 2)
-        
-        window_shape = Window.size
-        window_width = window_shape[0]
-        window_height = window_shape[1]
-        frame = cv2.resize(frame, (int(window_height * (self.cam.texture.size[0]/self.cam.texture.size[1])), window_height))
-        frame = frame.reshape((frame.shape[1],frame.shape[0], 4))
-        buf = frame.tobytes()
-        texture = Texture.create(size=(frame.shape[0], frame.shape[1]), colorfmt='rgba')
-        texture.blit_buffer(buf, colorfmt='rgba', bufferfmt='ubyte')
-        texture.flip_vertical()
-        self.img.texture = texture
-        
-    def close_popup(self,instance):
-        """
-            Closes the popup
-        """
-        self.popup.dismiss()
-        self.popupIsOpen = False
-        
-    def switch_screen(self,instance,screen):
-        Clock.unschedule(self.update_texture)
-        self.parent.current = screen
-        
-
-class RegisterInfoWindow(Screen):
-    def __init__(self,**kwargs):
-        super(RegisterInfoWindow, self).__init__(**kwargs)
-        self.name = "RegisterInfo"
-        grid = GridLayout(cols=2)
-        
-        #First name
-        firstNameLabel = Label(text="First name :")
-        self.firstNameInput=TextInput(multiline=False)
-        grid.add_widget(firstNameLabel)
-        grid.add_widget(self.firstNameInput)
-        
-        #Last name
-        lastNameLabel = Label(text="Last name :")
-        self.lastNameInput=TextInput(multiline=False)
-        grid.add_widget(lastNameLabel)
-        grid.add_widget(self.lastNameInput)
-        
-        #Date of birth
-        dobLabel = Label(text="Date of Birth :")
-        self.dobInput=TextInput(multiline=False)
-        grid.add_widget(dobLabel)
-        grid.add_widget(self.dobInput)
-        
-        #Telephone
-        telephoneLabel = Label(text="Telephone :")
-        self.telephoneInput=TextInput(multiline=False)
-        grid.add_widget(telephoneLabel)
-        grid.add_widget(self.telephoneInput)
-        
-        #Email
-        emailLabel = Label(text="Email :")
-        self.emailInput=TextInput(multiline=False)
-        grid.add_widget(emailLabel)
-        grid.add_widget(self.emailInput)
-        
-        #Belt
-        beltLabel = Label(text="Belt :")
-        self.beltDropdown = DropDown()
-        ranks = ["white","blue","purple","brown","black"]
-        for i in range(len(ranks)):
-            btn = Button(text=ranks[i], size_hint_y=None, height=44,on_release=lambda btn: self.beltDropdown.select(btn.text))
-            self.beltDropdown.add_widget(btn)
-        self.beltButton = Button(text="Belt rank",size_hint=(None, None))
-        self.beltButton.bind(on_release=self.beltDropdown.open)
-        self.beltDropdown.bind(on_select=lambda instance, x: setattr(self.beltButton, 'text', x))
-        grid.add_widget(beltLabel)
-        grid.add_widget(self.beltButton)
-        
-        confirmButton = Button(text="Confirm",size_hint_y=None,height='48dp')
-        cancelButton = Button(text="Cancel",size_hint_y=None,height='48dp')
-        confirmButton.bind(on_press=lambda x:self.switch_screen(self,"RegisterPhoto"))
-        cancelButton.bind(on_press=lambda x:self.switch_screen(self,"Main"))
-        grid.add_widget(confirmButton)
-        grid.add_widget(cancelButton)
-        
-        self.add_widget(grid)
-        
-    def switch_screen(self,instance,screen):
-        if screen == "Main":
-            Clock.schedule_interval(self.parent.get_screen('Main').update_texture, 1.0 / 60.0)
-        self.parent.current = screen
 
 
 class RegisterPhotoWindow(Screen):
@@ -440,4 +305,7 @@ class Program(App):
     
 
 if __name__ == "__main__":
+    Window.fullscreen = 'auto'
+    #Window.clearcolor = (1, 1, 1, 1)
+    info.init()
     Program().run()
