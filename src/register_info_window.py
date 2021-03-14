@@ -52,8 +52,7 @@ class RegisterInfoWindow(Screen):
         anchor.add_widget(self.telephoneInput)
         telephoneGrid.add_widget(telephoneLabel)
         telephoneGrid.add_widget(anchor)
-        grid.add_widget(telephoneGrid)
-        
+        grid.add_widget(telephoneGrid)  
         
         #Email
         emailGrid = GridLayout(cols=1)
@@ -64,7 +63,6 @@ class RegisterInfoWindow(Screen):
         emailGrid.add_widget(emailLabel)
         emailGrid.add_widget(anchor)
         grid.add_widget(emailGrid)
-
         
         #Belt
         beltGrid = GridLayout(cols=1)
@@ -85,12 +83,23 @@ class RegisterInfoWindow(Screen):
         
         confirmButton = Button(text="Confirm",size_hint_y=None,height='48dp')
         cancelButton = Button(text="Cancel",size_hint_y=None,height='48dp')
-        confirmButton.bind(on_press=lambda x:self.switch_screen(self,"RegisterPhoto"))
+        confirmButton.bind(on_press=self.confirm)
         cancelButton.bind(on_press=lambda x:self.switch_screen(self,"Main"))
         grid.add_widget(confirmButton)
         grid.add_widget(cancelButton)
         
         self.add_widget(grid)
+        
+    def validate(self):
+        inputs = [self.firstNameInput,self.lastNameInput,self.dobInput,self.telephoneInput,self.emailInput]
+        for i in inputs:
+            if i.text == "":
+                return False
+        return True
+        
+    def confirm(self,instance):
+        if self.validate():
+            self.switch_screen(self,"RegisterPhoto")
         
     def switch_screen(self,instance,screen):
         if screen == "Main":
