@@ -12,7 +12,7 @@ class RegisterInfoWindow(Screen):
     def __init__(self,**kwargs):
         super(RegisterInfoWindow, self).__init__(**kwargs)
         self.name = "RegisterInfo"
-        grid = GridLayout(cols=2,size_hint_x=None,col_force_default=True,col_default_width='500')      
+        grid = GridLayout(cols=2,padding=30,size_hint_x=None,col_force_default=True,col_default_width='500')      
         
         #First name
         firstNameGrid = GridLayout(cols=1)
@@ -26,42 +26,62 @@ class RegisterInfoWindow(Screen):
         
         #Last name
         lastNameGrid = GridLayout(cols=1)
-        lastNameLabel = Label(text="Last name :")
-        self.lastNameInput=TextInput(multiline=False)
+        lastNameLabel = Label(text="Last name :",size_hint_y=None,height=30)
+        anchor = AnchorLayout(size_hint_y=None,height=30)
+        self.lastNameInput=TextInput(multiline=False,size_hint_x=0.5)
+        anchor.add_widget(self.lastNameInput)
         lastNameGrid.add_widget(lastNameLabel)
-        lastNameGrid.add_widget(self.lastNameInput)
+        lastNameGrid.add_widget(anchor)
         grid.add_widget(lastNameGrid)
         
         #Date of birth
-        dobLabel = Label(text="Date of Birth :")
-        self.dobInput=TextInput(multiline=False)
-        grid.add_widget(dobLabel)
-        grid.add_widget(self.dobInput)
+        dobGrid = GridLayout(cols=1)
+        dobLabel = Label(text="Date of birth :",size_hint_y=None,height=30)
+        anchor = AnchorLayout(size_hint_y=None,height=30)
+        self.dobInput=TextInput(multiline=False,size_hint_x=0.5)
+        anchor.add_widget(self.dobInput)
+        dobGrid.add_widget(dobLabel)
+        dobGrid.add_widget(anchor)
+        grid.add_widget(dobGrid)
         
         #Telephone
-        telephoneLabel = Label(text="Telephone :")
-        self.telephoneInput=TextInput(multiline=False)
-        grid.add_widget(telephoneLabel)
-        grid.add_widget(self.telephoneInput)
+        telephoneGrid = GridLayout(cols=1)
+        telephoneLabel = Label(text="Telephone :",size_hint_y=None,height=30)
+        anchor = AnchorLayout(size_hint_y=None,height=30)
+        self.telephoneInput=TextInput(multiline=False,size_hint_x=0.5)
+        anchor.add_widget(self.telephoneInput)
+        telephoneGrid.add_widget(telephoneLabel)
+        telephoneGrid.add_widget(anchor)
+        grid.add_widget(telephoneGrid)
+        
         
         #Email
-        emailLabel = Label(text="Email :")
-        self.emailInput=TextInput(multiline=False)
-        grid.add_widget(emailLabel)
-        grid.add_widget(self.emailInput)
+        emailGrid = GridLayout(cols=1)
+        emailLabel = Label(text="Email :",size_hint_y=None,height=30)
+        anchor = AnchorLayout(size_hint_y=None,height=30)
+        self.emailInput=TextInput(multiline=False,size_hint_x=0.5)
+        anchor.add_widget(self.emailInput)
+        emailGrid.add_widget(emailLabel)
+        emailGrid.add_widget(anchor)
+        grid.add_widget(emailGrid)
+
         
         #Belt
-        beltLabel = Label(text="Belt :")
+        beltGrid = GridLayout(cols=1)
+        beltLabel = Label(text="Belt :",size_hint_y=None,height=30)
         self.beltDropdown = DropDown()
         ranks = ["white","blue","purple","brown","black"]
         for i in range(len(ranks)):
             btn = Button(text=ranks[i], size_hint_y=None, height=44,on_release=lambda btn: self.beltDropdown.select(btn.text))
             self.beltDropdown.add_widget(btn)
-        self.beltButton = Button(text="Belt rank",size_hint=(None, None))
+            
+        anchor = AnchorLayout(size_hint_y=None,height=30)
+        self.beltButton = Button(text="Belt rank",size_hint_x=0.5,size_hint_y=None,height='48dp')
         self.beltButton.bind(on_release=self.beltDropdown.open)
         self.beltDropdown.bind(on_select=lambda instance, x: setattr(self.beltButton, 'text', x))
-        grid.add_widget(beltLabel)
-        grid.add_widget(self.beltButton)
+        beltGrid.add_widget(beltLabel)
+        beltGrid.add_widget(self.beltButton)
+        grid.add_widget(beltGrid)
         
         confirmButton = Button(text="Confirm",size_hint_y=None,height='48dp')
         cancelButton = Button(text="Cancel",size_hint_y=None,height='48dp')

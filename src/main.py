@@ -31,6 +31,7 @@ import info
 
 from main_window import MainWindow
 from register_info_window import RegisterInfoWindow
+from register_photo_window import RegisterPhotoWindow
 
 """
 data = pickle.loads(open("encodings.pickle", "rb").read())
@@ -77,72 +78,6 @@ for i in range(500,5000):
     if i % 55 == 0:
         time.sleep(61)
 """
-
-
-class RegisterPhotoWindow(Screen):
-    def __init__(self,cam,**kwargs):
-        super(RegisterPhotoWindow, self).__init__(**kwargs)
-        self.name = "RegisterPhoto"
-        grid = GridLayout(cols=1)
-        self.img = Image(pos_hint={'center_x': 0.5, 'center_y': 0.5})
-        grid.add_widget(self.img)
-        subgrid = GridLayout(cols=3)
-        cancelButton = Button(text="Cancel",size_hint_y=None,height='48dp')
-        cancelButton.bind(on_press=lambda x:self.switch_screen(self,"RegisterInfo"))
-        photoButton = Button(text="Go",size_hint_y=None,height='48dp')
-        photoButton.bind(on_press=self.start_capture)
-        self.countdownText = Label(text="5")
-        subgrid.add_widget(self.countdownText)
-        subgrid.add_widget(cancelButton)
-        subgrid.add_widget(photoButton)
-        grid.add_widget(subgrid)
-        self.add_widget(grid)
-        self.cam = cam
-        Clock.schedule_interval(self.update_texture, 1.0 / 60.0)
-        
-        
-    def update_texture(self,instance):
-        """
-            Updates the live camera stream and calls the face recognition
-            functions. Draws squares around recognized faces and opens
-            the popup when a face has been recognized.
-        """
-            
-        frame = np.frombuffer(self.cam.texture.pixels,np.uint8)
-        frame = frame.reshape((self.cam.texture.size[1],self.cam.texture.size[0],4))
-        frame,encodings = get_faces_frame(frame)
-        if(self.countdownText.text.isnumeric() and int(self.countdownText.text) == 0):
-            self.countdownText.text = "Done !"
-            if(len(encodings) > 0):
-                new_user_id = post_to_db(self.parent.get_screen("RegisterInfo").firstNameInput.text,self.parent.get_screen("RegisterInfo").lastNameInput.text,self.parent.get_screen("RegisterInfo").dobInput.text,self.parent.get_screen("RegisterInfo").telephoneInput.text,self.parent.get_screen("RegisterInfo").emailInput.text,self.parent.get_screen("RegisterInfo").beltButton.text,encodings[0].tolist())
-                add_user(self.parent.get_screen("RegisterInfo").firstNameInput.text,self.parent.get_screen("RegisterInfo").lastNameInput.text,self.parent.get_screen("RegisterInfo").dobInput.text,self.parent.get_screen("RegisterInfo").telephoneInput.text,self.parent.get_screen("RegisterInfo").emailInput.text,self.parent.get_screen("RegisterInfo").beltButton.text,new_user_id)
-            else:
-                print("No face")
-            
-        window_shape = Window.size
-        window_width = window_shape[0]
-        window_height = window_shape[1]
-        frame = cv2.resize(frame, (int(window_height * (self.cam.texture.size[0]/self.cam.texture.size[1])), window_height))
-        frame = frame.reshape((frame.shape[1],frame.shape[0], 4))
-        buf = frame.tobytes()
-        texture = Texture.create(size=(frame.shape[0], frame.shape[1]), colorfmt='rgba')
-        texture.blit_buffer(buf, colorfmt='rgba', bufferfmt='ubyte')
-        texture.flip_vertical()
-        self.img.texture = texture
-        
-    def decrement_countdown(self,instance):
-        self.countdownText.text = str(int(self.countdownText.text) - 1)
-        
-    def start_capture(self,instance):
-        Clock.schedule_once(self.decrement_countdown,1)
-        Clock.schedule_once(self.decrement_countdown,2)
-        Clock.schedule_once(self.decrement_countdown,3)
-        Clock.schedule_once(self.decrement_countdown,4)
-        Clock.schedule_once(self.decrement_countdown,5)
-        
-    def switch_screen(self,instance,screen):
-        Clock.unschedule(self.update_texture)
-        self.parent.current = screen
         
 
 class ProblemWindow(Screen):
