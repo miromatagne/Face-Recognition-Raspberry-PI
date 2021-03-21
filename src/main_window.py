@@ -42,7 +42,7 @@ class MainWindow(Screen):
         self.popup = Popup(title='Welcome !',content=Label(text='Hello world'),auto_dismiss=False,size_hint=(.8, .8))
         self.popupIsOpen = False
         self.cam = cam
-        Clock.schedule_interval(self.update_texture, 1.0 / 60.0)
+        Clock.schedule_interval(self.update_texture, 1.0 / 100.0)
     
     def update_texture(self,instance):
         """

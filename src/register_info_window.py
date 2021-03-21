@@ -6,13 +6,18 @@ from kivy.uix.textinput import TextInput
 from kivy.uix.button import Button
 from kivy.uix.dropdown import DropDown
 from kivy.uix.anchorlayout import AnchorLayout
+from kivy.uix.popup import Popup
+from kivy.clock import Clock
+import re
 
 
 class RegisterInfoWindow(Screen):
     def __init__(self,**kwargs):
         super(RegisterInfoWindow, self).__init__(**kwargs)
         self.name = "RegisterInfo"
-        grid = GridLayout(cols=2,padding=30,size_hint_x=None,col_force_default=True,col_default_width='500')      
+        self.popup = Popup(title='Oops !',content=Label(text='Hello world'),auto_dismiss=False,size_hint=(.8, .8))
+        self.popupIsOpen = False
+        grid = GridLayout(cols=2,padding=[0,50,0,50],size_hint_x=None,col_force_default=True,col_default_width='500')      
         
         #First name
         firstNameGrid = GridLayout(cols=1)
@@ -92,10 +97,40 @@ class RegisterInfoWindow(Screen):
         
     def validate(self):
         inputs = [self.firstNameInput,self.lastNameInput,self.dobInput,self.telephoneInput,self.emailInput]
+        valid = True
+        if not re.search("^[a-zA-ZàáâäãåąčćęèéêëėįìíîïłńòóôöõøùúûüųūÿýżźñçčšžÀÁÂÄÃÅĄĆČĖĘÈÉÊËÌÍÎÏĮŁŃÒÓÔÖÕØÙÚÛÜŲŪŸÝŻŹÑßÇŒÆČŠŽ∂ð ,.'-]+$/u",self.firstNameInput.text):
+            message = "Please enter a valid first name"
+            valid = False
+        if not re.search("^[a-zA-ZàáâäãåąčćęèéêëėįìíîïłńòóôöõøùúûüųūÿýżźñçčšžÀÁÂÄÃÅĄĆČĖĘÈÉÊËÌÍÎÏĮŁŃÒÓÔÖÕØÙÚÛÜŲŪŸÝŻŹÑßÇŒÆČŠŽ∂ð ,.'-]+$/u",self.lastNameInput.text):
+            message = "Please enter a valid last name"
+            valid = False
+        if not re.search("^(0?[1-9]|[12][0-9]|3[01])\/(0?[1-9]|1[012])\/\d{4}$",self.dobInput.text):
+            message = "Please enter a valid date of birth"
+            valid = False
+        if not re.search("^[+]*[(]{0,1}[0-9]{1,4}[)]{0,1}[-\s\./0-9]*$",self.telephoneInput.text):
+            message = "Please enter a valid telephone number"
+            valid = False
+        if not re.search('^[a-z0-9]+[\._]?[a-z0-9]+[@]\w+[.]\w{2,3}$',self.emailInput.text):
+            message = "Please enter a valid email"
+            valid = False
         for i in inputs:
             if i.text == "":
-                return False
+                valid = False
+        if not valid:
+            print("Invalid")
+            self.popup.content = Label(text=message)
+            self.popupIsOpen = True
+            self.popup.open()
+            Clock.schedule_once(self.close_popup, 2)
+            return False
         return True
+    
+    def close_popup(self,instance):
+        """
+            Closes the popup
+        """
+        self.popup.dismiss()
+        self.popupIsOpen = False
         
     def confirm(self,instance):
         if self.validate():
