@@ -32,6 +32,8 @@ import info
 from main_window import MainWindow
 from register_info_window import RegisterInfoWindow
 from register_photo_window import RegisterPhotoWindow
+from already_member_window import AlreadyMemberWindow
+from already_member_photo_window import AlreadyMemberPhotoWindow
 
 """
 data = pickle.loads(open("encodings.pickle", "rb").read())
@@ -111,120 +113,7 @@ class ProblemWindow(Screen):
         if screen == "Main":
             Clock.schedule_interval(self.parent.get_screen('Main').update_texture, 1.0 / 60.0)
         self.parent.current = screen
-        
-
-class AlreadyMemberWindow(Screen):
-    def __init__(self,**kwargs):
-        super(AlreadyMemberWindow, self).__init__(**kwargs)
-        self.name = "AlreadyMember"
-        self.grid = GridLayout(cols=2)
-        
-        self.selectedMember = None
-        
-        #First name
-        nameLabel = Label(text="Name :")
-        self.nameInput=TextInput(multiline=False)
-        self.nameInput.bind(text=lambda x,y:self.update_list(self))
-        self.grid.add_widget(nameLabel)
-        self.grid.add_widget(self.nameInput)
-        
-        confirmButton = Button(text="Confirm",size_hint_y=None,height='48dp')
-        cancelButton = Button(text="Cancel",size_hint_y=None,height='48dp')
-        confirmButton.bind(on_press=lambda x:self.update_list(self))
-        cancelButton.bind(on_press=lambda x:self.switch_screen(self,"Main"))
-        
-        self.listScroll = ScrollView(size_hint=(1,1))
-        self.grid.add_widget(self.listScroll)
-        
-        self.grid.add_widget(confirmButton)
-        self.grid.add_widget(cancelButton)
-        
-        self.add_widget(self.grid)
-    
-    def update_list(self,instance):
-        self.listScroll.clear_widgets()
-        listGrid = GridLayout(cols=1,spacing=10,size_hint_y=None)
-        listGrid.bind(minimum_height=listGrid.setter('height'))
-        print(values)
-        for i in range(len(values)):
-            name = values[i][0] + " " + values[i][1]
-            if self.nameInput.text != "" and self.nameInput.text in name:
-                btn = Button(text=name,size_hint_y=None,height='48dp')
-                btn.bind(on_press=lambda *args, i=i: self.select_member(self,i))
-                listGrid.add_widget(btn)
-        self.listScroll.add_widget(listGrid)
-        
-    def switch_screen(self,instance,screen):
-        if screen == "Main":
-            Clock.schedule_interval(self.parent.get_screen('Main').update_texture, 1.0 / 60.0)
-        self.parent.current = screen
-        
-    def select_member(self,instance,i):
-        self.selectedMember = values[i]
-        self.switch_screen(self,"AlreadyMemberPhoto")
-        
-
-class AlreadyMemberPhotoWindow(Screen):
-    def __init__(self,cam,**kwargs):
-        super(AlreadyMemberPhotoWindow, self).__init__(**kwargs)
-        self.name = "AlreadyMemberPhoto"
-        grid = GridLayout(cols=1)
-        self.img = Image(pos_hint={'center_x': 0.5, 'center_y': 0.5})
-        grid.add_widget(self.img)
-        subgrid = GridLayout(cols=3)
-        cancelButton = Button(text="Cancel",size_hint_y=None,height='48dp')
-        cancelButton.bind(on_press=lambda x:self.switch_screen(self,"AlreadyMember"))
-        photoButton = Button(text="Go",size_hint_y=None,height='48dp')
-        photoButton.bind(on_press=self.start_capture)
-        self.countdownText = Label(text="5")
-        subgrid.add_widget(self.countdownText)
-        subgrid.add_widget(cancelButton)
-        subgrid.add_widget(photoButton)
-        grid.add_widget(subgrid)
-        self.add_widget(grid)
-        self.cam = cam
-        Clock.schedule_interval(self.update_texture, 1.0 / 60.0)
-        
-        
-    def update_texture(self,instance):
-        """
-            Updates the live camera stream and calls the face recognition
-            functions. Draws squares around recognized faces and opens
-            the popup when a face has been recognized.
-        """
-            
-        frame = np.frombuffer(self.cam.texture.pixels,np.uint8)
-        frame = frame.reshape((self.cam.texture.size[1],self.cam.texture.size[0],4))
-        frame,encodings = get_faces_frame(frame)
-        if(self.countdownText.text.isnumeric() and int(self.countdownText.text) == 0):
-            self.countdownText.text = "Done !"
-            if(len(encodings) > 0):
-                user = self.parent.get_screen("AlreadyMember").selectedMember
-                post_to_db(user[0],user[1],user[6],user[4],user[5],user[9],encodings[0].tolist())
-            else:
-                print("No face")
-            
-        window_shape = Window.size
-        window_width = window_shape[0]
-        window_height = window_shape[1]
-        frame = cv2.resize(frame, (int(window_height * (self.cam.texture.size[0]/self.cam.texture.size[1])), window_height))
-        frame = frame.reshape((frame.shape[1],frame.shape[0], 4))
-        buf = frame.tobytes()
-        texture = Texture.create(size=(frame.shape[0], frame.shape[1]), colorfmt='rgba')
-        texture.blit_buffer(buf, colorfmt='rgba', bufferfmt='ubyte')
-        texture.flip_vertical()
-        self.img.texture = texture
-        
-    def decrement_countdown(self,instance):
-        self.countdownText.text = str(int(self.countdownText.text) - 1)
-        
-    def start_capture(self,instance):
-        Clock.schedule_once(self.decrement_countdown,1)
-        Clock.schedule_once(self.decrement_countdown,2)
-        Clock.schedule_once(self.decrement_countdown,3)
-        Clock.schedule_once(self.decrement_countdown,4)
-        Clock.schedule_once(self.decrement_countdown,5)
-        
+          
 
 class Program(App):
     def build(self):
