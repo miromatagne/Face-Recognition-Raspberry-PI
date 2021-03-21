@@ -1,6 +1,7 @@
 import os
 os.environ['KIVY_AUDIO'] = 'sdl2'
 import kivy
+import info
 from kivy.app import App
 from kivy.uix.label import Label
 from kivy.uix.gridlayout import GridLayout
@@ -27,7 +28,6 @@ from kivy.clock import Clock
 from kivy.graphics.texture import Texture
 from kivy.core.window import Window
 import time
-import info
 
 from main_window import MainWindow
 from register_info_window import RegisterInfoWindow

@@ -1,6 +1,7 @@
 from google.oauth2 import service_account
 from googleapiclient.discovery import build
 from datetime import datetime
+import info
 
 SCOPES = ['https://www.googleapis.com/auth/spreadsheets']
 SERVICE_ACCOUNT_FILE = '../keys.json'
@@ -60,7 +61,7 @@ def write_presence(values, id):
     if row is not None and column is not None:
         request = sheet.values().update(spreadsheetId=SAMPLE_SPREADSHEET_ID, valueInputOption="USER_ENTERED",
                                         range="2016-2020!"+str(column)+str(row), body={"values": [["X"]]}).execute()
-
+    
 def write_presence_from_name(values, firstName, lastName):
     column = get_date_column(values)
     row = get_name_row(values, firstName,lastName)
@@ -74,6 +75,8 @@ def add_user(firstName,lastName,dob,telephone,email,rank,id):
     #nbRows = len(values)
     request = sheet.values().append(spreadsheetId=SAMPLE_SPREADSHEET_ID, valueInputOption="USER_ENTERED",
                                         range="2016-2020", body={"values": [[firstName,lastName,str(id),'',telephone,email,dob,'','',rank]]}).execute()
+    info.update_spreadsheet()
+
 
 def write_new_column(values):
     nbRow = 2
@@ -96,5 +99,5 @@ def write_new_column(values):
     request = service.spreadsheets().batchUpdate(spreadsheetId=SAMPLE_SPREADSHEET_ID, body=body).execute()
     request = sheet.values().update(spreadsheetId=SAMPLE_SPREADSHEET_ID, valueInputOption="USER_ENTERED",
                                         range="2016-2020!"+str(nbCol)+str(nbRow), body={"values": [[date]]}).execute()
-
+    info.update_spreadsheet()
     return nbCol

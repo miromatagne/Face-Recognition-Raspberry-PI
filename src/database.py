@@ -1,5 +1,6 @@
 from pymongo import MongoClient
 from bson.objectid import ObjectId
+import info
 
 # TODO: change URL and cluster name
 cluster = MongoClient(
@@ -11,6 +12,7 @@ collection = db["Users"]
 def post_to_db(firstName,lastName,dob,telephone,email,rank,encoding):
     post = {"firstName": firstName, "lastName": lastName, "dob": dob, "telephone": telephone, "email": email, "rank": rank, "encoding":encoding}
     id = collection.insert_one(post)
+    info.update_db()
     return id.inserted_id
 
 
