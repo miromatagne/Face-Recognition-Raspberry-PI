@@ -4,10 +4,12 @@ from kivy.uix.label import Label
 from kivy.uix.gridlayout import GridLayout
 from kivy.uix.screenmanager import Screen
 from kivy.uix.textinput import TextInput
+from kivy.uix.popup import Popup
 from kivy.uix.button import Button
 from kivy.uix.scrollview import ScrollView
 from kivy.uix.anchorlayout import AnchorLayout
 from kivy.clock import Clock
+from custom_button import CustomButton
 import time
 import info
 
@@ -38,8 +40,8 @@ class AlreadyMemberWindow(Screen):
         self.grid.add_widget(subgrid)
         
         button_grid = GridLayout(cols=2,size_hint_y=1)
-        confirmButton = Button(text="Confirm",size_hint_y=None,height='48dp')
-        cancelButton = Button(text="Cancel",size_hint_y=None,height='48dp')
+        confirmButton = CustomButton(text="Confirm")
+        cancelButton = CustomButton(text="Cancel")
         confirmButton.bind(on_press=lambda x:self.update_list(self))
         cancelButton.bind(on_press=lambda x:self.switch_screen(self,"Main"))
         
@@ -49,6 +51,8 @@ class AlreadyMemberWindow(Screen):
         self.grid.add_widget(button_grid)
         
         self.add_widget(self.grid)
+        
+        self.popup = Popup(title='Welcome !',content=Label(text='Hello world'),auto_dismiss=False,size_hint=(.8, .8))
     
     def update_list(self,instance):
         self.listScroll.clear_widgets()
@@ -70,6 +74,22 @@ class AlreadyMemberWindow(Screen):
         self.parent.current = screen
         
     def select_member(self,instance,i):
-        self.selectedMember = info.values[i]
-        self.switch_screen(self,"AlreadyMemberPhoto")
+        user_exists = False
+        for db_user in info.users:
+            if db_user["_id"] == info.values[i][2]:
+                user_exists = True
+                break
+        if not user_exists:
+            self.selectedMember = info.values[i]
+            self.selectedMemberIndex = i
+            self.switch_screen(self,"AlreadyMemberPhoto")
+        else:
+            self.popup.content = Label(text="Your face is already registered, you will be redirected to the main page.")
+            self.popup.open()
+            Clock.schedule_once(self.user_already_registered, 3)
+            
+    def user_already_registered(self,instance):
+        self.popup.dismiss()
+        self.switch_screen(self,'Main')
+            
         

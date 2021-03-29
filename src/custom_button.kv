@@ -1,0 +1,12 @@
+<CustomButton@Button>
+    background_color: 0,0,0,0
+    background_normal: ''
+    size_hint_y: None
+    height: 48
+    canvas.before:
+        Color:
+            rgba: (51/255,133/255,255/255,1)
+        RoundedRectangle:
+            size: self.size
+            pos: self.pos
+            radius: [25]

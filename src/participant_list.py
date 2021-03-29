@@ -101,3 +101,11 @@ def write_new_column(values):
                                         range="2016-2020!"+str(nbCol)+str(nbRow), body={"values": [[date]]}).execute()
     info.update_spreadsheet()
     return nbCol
+
+def write_new_id(values,index,new_id):
+    nbCol = "C"
+    nbRow = index+1
+    request = sheet.values().update(spreadsheetId=SAMPLE_SPREADSHEET_ID, valueInputOption="USER_ENTERED",
+                                        range="2016-2020!"+str(nbCol)+str(nbRow), body={"values": [[str(new_id)]]}).execute()
+    info.update_spreadsheet()
+        

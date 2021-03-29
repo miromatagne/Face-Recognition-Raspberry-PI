@@ -10,10 +10,12 @@ import cv2
 import face_recognition
 import numpy as np
 from faces import find_encodings,get_matches,get_faces_frame
-from participant_list import add_user,get_sheet_content,write_presence,write_presence_from_name
+from participant_list import add_user,write_new_id,get_sheet_content,write_presence,write_presence_from_name
+from database import post_to_db,get_documents
 from kivy.clock import Clock
 from kivy.graphics.texture import Texture
 from kivy.core.window import Window
+from custom_button import CustomButton
 import time
 import info
 
@@ -27,9 +29,9 @@ class AlreadyMemberPhotoWindow(Screen):
         self.info_label = Label(text="Press the confirm button, a picture of you will be taken in 5 seconds. Make sure your face is clearly visible !")
         grid.add_widget(self.info_label)
         subgrid = GridLayout(cols=3,size_hint_y=1)
-        cancelButton = Button(text="Cancel",size_hint_y=None,height='48dp')
+        cancelButton = CustomButton(text="Cancel")
         cancelButton.bind(on_press=lambda x:self.switch_screen(self,"AlreadyMember"))
-        photoButton = Button(text="Go",size_hint_y=None,height='48dp')
+        photoButton = CustomButton(text="Go")
         photoButton.bind(on_press=self.start_capture)
         self.countdownText = Label(text="5")
         subgrid.add_widget(self.countdownText)
@@ -56,7 +58,8 @@ class AlreadyMemberPhotoWindow(Screen):
             if(len(encodings) > 0):
                 self.info_label.text = "Your registration was successful, you will be redirected towards the main screen."
                 user = self.parent.get_screen("AlreadyMember").selectedMember
-                post_to_db(user[0],user[1],user[6],user[4],user[5],user[9],encodings[0].tolist())
+                user_id = post_to_db(user[0],user[1],user[6],user[4],user[5],user[9],encodings[0].tolist())
+                write_new_id(info.values,self.parent.get_screen("AlreadyMember").selectedMemberIndex,user_id)
                 Clock.schedule_once(lambda x : self.switch_screen(self,"Main"),2.0)
             else:
                 self.countdownText.text = "5"

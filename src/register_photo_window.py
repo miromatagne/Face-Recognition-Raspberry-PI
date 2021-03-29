@@ -10,9 +10,12 @@ from participant_list import add_user
 from kivy.clock import Clock
 from kivy.graphics.texture import Texture
 from kivy.core.window import Window
+from database import post_to_db,get_documents
+from participant_list import add_user,get_sheet_content,write_presence,write_presence_from_name
 import numpy as np
 import cv2
 import time
+from custom_button import CustomButton
 
 
 class RegisterPhotoWindow(Screen):
@@ -25,9 +28,9 @@ class RegisterPhotoWindow(Screen):
         self.info_label = Label(text="Press the confirm button, a picture of you will be taken in 5 seconds. Make sure your face is clearly visible !")
         grid.add_widget(self.info_label)
         subgrid = GridLayout(cols=3,size_hint_y=1)
-        cancelButton = Button(text="Cancel",size_hint_y=None,height='48dp')
+        cancelButton = CustomButton(text="Cancel")
         cancelButton.bind(on_press=lambda x:self.switch_screen(self,"RegisterInfo"))
-        photoButton = Button(text="Go",size_hint_y=None,height='48dp')
+        photoButton = CustomButton(text="Go")
         photoButton.bind(on_press=self.start_capture)
         self.countdownText = Label(text="5")
         subgrid.add_widget(self.countdownText)

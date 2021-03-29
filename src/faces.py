@@ -1,6 +1,7 @@
 import cv2
 import face_recognition
 import numpy as np
+import info
 
 recognizedFaces = []
 
@@ -45,9 +46,9 @@ def get_matches(frame,knownEncodings,users):
             matchId = np.argmin(faceDistances)
 
             if matches[matchId]:
-                if users[matchId]["_id"] not in recognizedFaces:
-                    recognizedUsers.append(users[matchId])
-                    recognizedFaces.append(users[matchId]["_id"])
+                if info.users[matchId]["_id"] not in recognizedFaces:
+                    recognizedUsers.append(info.users[matchId])
+                    recognizedFaces.append(info.users[matchId]["_id"])
                     
                 y1, x2, y2, x1 = faceLocation
                 y1, x2, y2, x1 = y1*4, x2*4, y2*4, x1*4

@@ -1,5 +1,5 @@
 import os
-os.environ['KIVY_AUDIO'] = 'sdl2'
+#os.environ['KIVY_AUDIO'] = 'sdl2'
 import kivy
 import info
 from kivy.app import App
@@ -13,6 +13,7 @@ from kivy.uix.popup import Popup
 from kivy.uix.button import Button
 from kivy.uix.dropdown import DropDown
 from kivy.uix.scrollview import ScrollView
+from kivy.uix.widget import Widget
 from kivy.lang import Builder
 from kivy.core.audio import SoundLoader
 import cv2
@@ -34,6 +35,7 @@ from register_info_window import RegisterInfoWindow
 from register_photo_window import RegisterPhotoWindow
 from already_member_window import AlreadyMemberWindow
 from already_member_photo_window import AlreadyMemberPhotoWindow
+from problem_window import ProblemWindow
 
 """
 data = pickle.loads(open("encodings.pickle", "rb").read())
@@ -80,41 +82,7 @@ for i in range(500,5000):
     if i % 55 == 0:
         time.sleep(61)
 """
-        
-
-class ProblemWindow(Screen):
-    def __init__(self,**kwargs):
-        super(ProblemWindow, self).__init__(**kwargs)
-        self.name = "Problem"
-        grid = GridLayout(cols=2)
-        
-        #First name
-        firstNameLabel = Label(text="First name :")
-        self.firstNameInput=TextInput(multiline=False)
-        grid.add_widget(firstNameLabel)
-        grid.add_widget(self.firstNameInput)
-        
-        #Last name
-        lastNameLabel = Label(text="Last name :")
-        self.lastNameInput=TextInput(multiline=False)
-        grid.add_widget(lastNameLabel)
-        grid.add_widget(self.lastNameInput)
-        
-        confirmButton = Button(text="Confirm",size_hint_y=None,height='48dp')
-        cancelButton = Button(text="Cancel",size_hint_y=None,height='48dp')
-        confirmButton.bind(on_press=lambda x:write_presence_from_name(values,self.firstNameInput.text,self.lastNameInput.text))
-        cancelButton.bind(on_press=lambda x:self.switch_screen(self,"Main"))
-        grid.add_widget(confirmButton)
-        grid.add_widget(cancelButton)
-        
-        self.add_widget(grid)
-        
-    def switch_screen(self,instance,screen):
-        if screen == "Main":
-            Clock.schedule_interval(self.parent.get_screen('Main').update_texture, 1.0 / 60.0)
-        self.parent.current = screen
           
-
 class Program(App):
     def build(self):
         self.cam = Camera(play=True)
@@ -130,6 +98,6 @@ class Program(App):
 
 if __name__ == "__main__":
     Window.fullscreen = 'auto'
-    #Window.clearcolor = (1, 1, 1, 1)
+    Window.clearcolor = (1, 1, 1, 1)
     info.init()
     Program().run()

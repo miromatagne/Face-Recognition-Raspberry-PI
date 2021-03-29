@@ -17,20 +17,22 @@ from participant_list import add_user,get_sheet_content,write_presence,write_pre
 from kivy.clock import Clock
 from kivy.graphics.texture import Texture
 from kivy.core.window import Window
+from custom_button import CustomButton
 import info
 
 class MainWindow(Screen):
     def __init__(self,cam,**kwargs):
         super(MainWindow, self).__init__(**kwargs)
         self.name = "Main"
-        grid = GridLayout(cols=1)
+        grid = GridLayout(cols=1,spacing=20,padding=[20,0,20,0])
         self.img = Image(size_hint_y=10)
         grid.add_widget(self.img)
-        subgrid = GridLayout(cols=3,size_hint_y=1)
-        registerButton = Button(text="Register",size_hint_y=None,height='48',background_color=(1,0,0,1))
-        guestButton = Button(text="Guest",size_hint_y=None,height='48')
-        alreadyMemberButton = Button(text="Already a member ?",size_hint_y=None,height='48dp')
-        problemButton = Button(text="Problem ?",size_hint_y=None,height='48dp')
+        subgrid = GridLayout(cols=3,size_hint_y=1,spacing=20)
+        #registerButton = Button(text="Register",size_hint_y=None,height='48',background_color=(1,0,0,1))
+        registerButton = CustomButton(text="Register")
+        guestButton = CustomButton(text="Guest")
+        alreadyMemberButton = CustomButton(text="Already a member ?")
+        problemButton = CustomButton(text="Problem ?")
         registerButton.bind(on_press=lambda x:self.switch_screen(self,"RegisterInfo"))
         alreadyMemberButton.bind(on_press=lambda x:self.switch_screen(self,"AlreadyMember"))
         problemButton.bind(on_press=lambda x:self.switch_screen(self,"Problem"))

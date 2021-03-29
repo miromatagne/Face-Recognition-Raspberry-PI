@@ -1,6 +1,7 @@
 import kivy
 from kivy.uix.label import Label
 from kivy.uix.gridlayout import GridLayout
+from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.screenmanager import Screen
 from kivy.uix.textinput import TextInput
 from kivy.uix.button import Button
@@ -8,6 +9,8 @@ from kivy.uix.dropdown import DropDown
 from kivy.uix.anchorlayout import AnchorLayout
 from kivy.uix.popup import Popup
 from kivy.clock import Clock
+from custom_button import CustomButton
+from custom_label import CustomLabel
 import re
 
 
@@ -17,11 +20,12 @@ class RegisterInfoWindow(Screen):
         self.name = "RegisterInfo"
         self.popup = Popup(title='Oops !',content=Label(text='Hello world'),auto_dismiss=False,size_hint=(.8, .8))
         self.popupIsOpen = False
-        grid = GridLayout(cols=2,padding=[0,50,0,50],size_hint_x=None,col_force_default=True,col_default_width='500')      
+        main_grid = BoxLayout(orientation="vertical",padding=[20,0,20,0])
+        grid = GridLayout(cols=2,padding=[0,100,0,0],spacing=20,size_hint_y=10,col_force_default=True,col_default_width='500')      
         
         #First name
         firstNameGrid = GridLayout(cols=1)
-        firstNameLabel = Label(text="First name :",size_hint_y=None,height=30)
+        firstNameLabel = CustomLabel(text="First name :")
         anchor = AnchorLayout(size_hint_y=None,height=30)
         self.firstNameInput=TextInput(multiline=False,size_hint_x=0.5)
         anchor.add_widget(self.firstNameInput)
@@ -31,7 +35,7 @@ class RegisterInfoWindow(Screen):
         
         #Last name
         lastNameGrid = GridLayout(cols=1)
-        lastNameLabel = Label(text="Last name :",size_hint_y=None,height=30)
+        lastNameLabel = CustomLabel(text="Last name :")
         anchor = AnchorLayout(size_hint_y=None,height=30)
         self.lastNameInput=TextInput(multiline=False,size_hint_x=0.5)
         anchor.add_widget(self.lastNameInput)
@@ -41,7 +45,7 @@ class RegisterInfoWindow(Screen):
         
         #Date of birth
         dobGrid = GridLayout(cols=1)
-        dobLabel = Label(text="Date of birth :",size_hint_y=None,height=30)
+        dobLabel = CustomLabel(text="Date of birth :")
         anchor = AnchorLayout(size_hint_y=None,height=30)
         self.dobInput=TextInput(multiline=False,size_hint_x=0.5)
         anchor.add_widget(self.dobInput)
@@ -51,7 +55,7 @@ class RegisterInfoWindow(Screen):
         
         #Telephone
         telephoneGrid = GridLayout(cols=1)
-        telephoneLabel = Label(text="Telephone :",size_hint_y=None,height=30)
+        telephoneLabel = CustomLabel(text="Telephone :")
         anchor = AnchorLayout(size_hint_y=None,height=30)
         self.telephoneInput=TextInput(multiline=False,size_hint_x=0.5)
         anchor.add_widget(self.telephoneInput)
@@ -61,7 +65,7 @@ class RegisterInfoWindow(Screen):
         
         #Email
         emailGrid = GridLayout(cols=1)
-        emailLabel = Label(text="Email :",size_hint_y=None,height=30)
+        emailLabel = CustomLabel(text="Email :")
         anchor = AnchorLayout(size_hint_y=None,height=30)
         self.emailInput=TextInput(multiline=False,size_hint_x=0.5)
         anchor.add_widget(self.emailInput)
@@ -71,7 +75,7 @@ class RegisterInfoWindow(Screen):
         
         #Belt
         beltGrid = GridLayout(cols=1)
-        beltLabel = Label(text="Belt :",size_hint_y=None,height=30)
+        beltLabel = CustomLabel(text="Belt :")
         self.beltDropdown = DropDown()
         ranks = ["white","blue","purple","brown","black"]
         for i in range(len(ranks)):
@@ -86,14 +90,18 @@ class RegisterInfoWindow(Screen):
         beltGrid.add_widget(self.beltButton)
         grid.add_widget(beltGrid)
         
-        confirmButton = Button(text="Confirm",size_hint_y=None,height='48dp')
-        cancelButton = Button(text="Cancel",size_hint_y=None,height='48dp')
+        button_grid = GridLayout(cols=2,spacing=20,size_hint_y=1)
+        confirmButton = CustomButton(text="Confirm")
+        cancelButton = CustomButton(text="Cancel")
         confirmButton.bind(on_press=self.confirm)
         cancelButton.bind(on_press=lambda x:self.switch_screen(self,"Main"))
-        grid.add_widget(confirmButton)
-        grid.add_widget(cancelButton)
+        button_grid.add_widget(cancelButton)
+        button_grid.add_widget(confirmButton)
         
-        self.add_widget(grid)
+        main_grid.add_widget(grid)
+        main_grid.add_widget(button_grid)
+        
+        self.add_widget(main_grid)
         
     def validate(self):
         inputs = [self.firstNameInput,self.lastNameInput,self.dobInput,self.telephoneInput,self.emailInput]
