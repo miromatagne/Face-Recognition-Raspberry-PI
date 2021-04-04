@@ -4,7 +4,6 @@ from kivy.uix.label import Label
 from kivy.uix.gridlayout import GridLayout
 from kivy.uix.screenmanager import Screen
 from kivy.uix.image import Image
-from kivy.uix.popup import Popup
 from kivy.uix.button import Button
 import cv2
 import face_recognition

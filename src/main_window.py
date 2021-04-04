@@ -5,8 +5,6 @@ from kivy.uix.label import Label
 from kivy.uix.gridlayout import GridLayout
 from kivy.uix.screenmanager import Screen
 from kivy.uix.image import Image
-from kivy.uix.popup import Popup
-from kivy.uix.button import Button
 from kivy.core.audio import SoundLoader
 import cv2
 import face_recognition
@@ -18,6 +16,7 @@ from kivy.clock import Clock
 from kivy.graphics.texture import Texture
 from kivy.core.window import Window
 from custom_button import CustomButton
+from custom_popup import CustomPopup
 import info
 
 class MainWindow(Screen):
@@ -28,7 +27,6 @@ class MainWindow(Screen):
         self.img = Image(size_hint_y=10)
         grid.add_widget(self.img)
         subgrid = GridLayout(cols=3,size_hint_y=1,spacing=20)
-        #registerButton = Button(text="Register",size_hint_y=None,height='48',background_color=(1,0,0,1))
         registerButton = CustomButton(text="Register")
         guestButton = CustomButton(text="Guest")
         alreadyMemberButton = CustomButton(text="Already a member ?")
@@ -41,7 +39,7 @@ class MainWindow(Screen):
         subgrid.add_widget(problemButton)
         grid.add_widget(subgrid)
         self.add_widget(grid)
-        self.popup = Popup(title='Welcome !',content=Label(text='Hello world'),auto_dismiss=False,size_hint=(.8, .8))
+        self.popup = CustomPopup(title='Welcome !',content=Label(text='Hello world'))
         self.popupIsOpen = False
         self.cam = cam
         Clock.schedule_interval(self.update_texture, 1.0 / 100.0)

@@ -36,52 +36,6 @@ from register_photo_window import RegisterPhotoWindow
 from already_member_window import AlreadyMemberWindow
 from already_member_photo_window import AlreadyMemberPhotoWindow
 from problem_window import ProblemWindow
-
-"""
-data = pickle.loads(open("encodings.pickle", "rb").read())
-names = data["names"]
-knownEncodings = data["encodings"]
-
-path = '/home/pi/Desktop/proj-h402-face-recognition/testImages'
-fileList = os.listdir(path)
-newImages = []
-newNames = []
-
-for f in fileList:
-    if(f not in names):
-        currentImg = cv2.imread(path + "/" + f)
-        newImages.append(currentImg)
-        newNames.append(f)
-
-if len(newImages) != 0:
-    newEncodings = find_encodings(newImages)
-    for e,n in zip(newEncodings,newNames):
-        knownEncodings.append(e)
-        names.append(n)
-
-    data = {"encodings": knownEncodings,"names": names}
-    f = open("encodings.pickle", "wb")
-    f.write(pickle.dumps(data))
-    f.close()
-"""
-"""  
-docs = get_documents()
-knownEncodings = []
-users = []
-for d in docs:
-    knownEncodings.append(d["encoding"])
-    users.append({"_id":str(d["_id"]),"name":d["firstName"],"telehpone":d["telephone"],"email":d["email"]})
-
-values = get_sheet_content()
-"""
-"""
-for i in range(500,5000):
-    encoding = np.random.uniform(low=-1,high=1,size=(128,))
-    new_user_id = post_to_db("Miro" + str(i),"Test","21/03/2000","0467534184","mirotest@gmail.com","black",encoding.tolist())
-    add_user("Miro" + str(i),"Test","21/03/2000","0467534184","mirotest@gmail.com","black",new_user_id)
-    if i % 55 == 0:
-        time.sleep(61)
-"""
           
 class Program(App):
     def build(self):
@@ -93,8 +47,7 @@ class Program(App):
         sm.add_widget(ProblemWindow())
         sm.add_widget(AlreadyMemberWindow())
         sm.add_widget(AlreadyMemberPhotoWindow(self.cam))
-        return sm
-    
+        return sm  
 
 if __name__ == "__main__":
     Window.fullscreen = 'auto'

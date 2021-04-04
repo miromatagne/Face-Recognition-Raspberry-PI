@@ -18,6 +18,7 @@ from participant_list import write_presence_from_name
 from kivy.clock import Clock
 from custom_button import CustomButton
 from custom_label import CustomLabel
+from custom_textinput import CustomTextInput
 
 
 class ProblemWindow(Screen):
@@ -31,7 +32,7 @@ class ProblemWindow(Screen):
         firstNameGrid = GridLayout(cols=1)
         firstNameLabel = CustomLabel(text="First name :")
         anchor = AnchorLayout(size_hint_y=None,height=30)
-        self.firstNameInput=TextInput(multiline=False,size_hint_x=0.5)
+        self.firstNameInput=CustomTextInput()
         anchor.add_widget(self.firstNameInput)
         firstNameGrid.add_widget(firstNameLabel)
         firstNameGrid.add_widget(anchor)
@@ -41,7 +42,7 @@ class ProblemWindow(Screen):
         lastNameGrid = GridLayout(cols=1)
         lastNameLabel = CustomLabel(text="Last name :")
         anchor = AnchorLayout(size_hint_y=None,height=30)
-        self.lastNameInput=TextInput(multiline=False,size_hint_x=0.5)
+        self.lastNameInput=CustomTextInput()
         anchor.add_widget(self.lastNameInput)
         lastNameGrid.add_widget(lastNameLabel)
         lastNameGrid.add_widget(anchor)
@@ -53,8 +54,8 @@ class ProblemWindow(Screen):
         cancelButton = CustomButton(text="Cancel")
         confirmButton.bind(on_press=lambda x:write_presence_from_name(values,self.firstNameInput.text,self.lastNameInput.text))
         cancelButton.bind(on_press=lambda x:self.switch_screen(self,"Main"))
-        buttonGrid.add_widget(confirmButton)
         buttonGrid.add_widget(cancelButton)
+        buttonGrid.add_widget(confirmButton)
         box.add_widget(buttonGrid)
         
         self.add_widget(box)

@@ -3,13 +3,13 @@ from kivy.app import App
 from kivy.uix.label import Label
 from kivy.uix.gridlayout import GridLayout
 from kivy.uix.screenmanager import Screen
-from kivy.uix.textinput import TextInput
-from kivy.uix.popup import Popup
-from kivy.uix.button import Button
 from kivy.uix.scrollview import ScrollView
 from kivy.uix.anchorlayout import AnchorLayout
 from kivy.clock import Clock
 from custom_button import CustomButton
+from custom_textinput import CustomTextInput
+from custom_label import CustomLabel
+from custom_popup import CustomPopup
 import time
 import info
 
@@ -18,16 +18,16 @@ class AlreadyMemberWindow(Screen):
     def __init__(self,**kwargs):
         super(AlreadyMemberWindow, self).__init__(**kwargs)
         self.name = "AlreadyMember"
-        self.grid = GridLayout(cols=1,padding=[0,50,0,50])
+        self.grid = GridLayout(cols=1,padding=[20,100,20,0])
         
         self.selectedMember = None
         
         subgrid = GridLayout(cols=2,size_hint_y=10)
         
         inputGrid = GridLayout(cols=1)
-        nameLabel = Label(text="Name :",size_hint_y=None,height=30)
+        nameLabel = CustomLabel(text="Name :")
         anchor = AnchorLayout(size_hint_y=None,height=30)
-        self.nameInput=TextInput(multiline=False,size_hint_x=0.5)
+        self.nameInput=CustomTextInput()
         self.nameInput.bind(text=lambda x,y:self.update_list(self))
         anchor.add_widget(self.nameInput)
         inputGrid.add_widget(nameLabel)
@@ -39,7 +39,7 @@ class AlreadyMemberWindow(Screen):
         
         self.grid.add_widget(subgrid)
         
-        button_grid = GridLayout(cols=2,size_hint_y=1)
+        button_grid = GridLayout(cols=2,size_hint_y=1,spacing=20)
         confirmButton = CustomButton(text="Confirm")
         cancelButton = CustomButton(text="Cancel")
         confirmButton.bind(on_press=lambda x:self.update_list(self))
@@ -52,7 +52,7 @@ class AlreadyMemberWindow(Screen):
         
         self.add_widget(self.grid)
         
-        self.popup = Popup(title='Welcome !',content=Label(text='Hello world'),auto_dismiss=False,size_hint=(.8, .8))
+        self.popup = CustomPopup(title='Welcome !',content=Label(text='Hello world'))
     
     def update_list(self,instance):
         self.listScroll.clear_widgets()
@@ -63,7 +63,7 @@ class AlreadyMemberWindow(Screen):
             name = info.values[i][0] + " " + info.values[i][1]
             #print(name)
             if len(self.nameInput.text) > 2 and (self.nameInput.text).lower() in name.lower():
-                btn = Button(text=name,size_hint_y=None,height='48dp')
+                btn = CustomButton(text=name,size_hint_y=None,height='48dp')
                 btn.bind(on_press=lambda *args, i=i: self.select_member(self,i))
                 listGrid.add_widget(btn)
         self.listScroll.add_widget(listGrid)

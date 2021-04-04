@@ -1,0 +1,33 @@
+<CustomTextInput@TextInput>
+    background_color: 0,0,0,0
+    background_normal: ''
+    height: 48
+    font_size: self.height*0.5
+    size_hint_x:0.5
+    multiline:False
+    canvas.before:
+        Color:
+            rgba: (0,0,0,1)
+    canvas.after:
+        Color:
+            rgb: (255,255,255)
+        Ellipse:
+            angle_start:180
+            angle_end:360
+            pos:(self.pos[0] - self.size[1]/2.0, self.pos[1])
+            size: (self.size[1], self.size[1])
+        Ellipse:
+            angle_start:360
+            angle_end:540
+            pos: (self.size[0] + self.pos[0] - self.size[1]/2.0, self.pos[1])
+            size: (self.size[1], self.size[1])
+        Color:
+            rgba: (51/255,133/255,255/255,1)
+        Line:
+            points: self.pos[0] , self.pos[1], self.pos[0] + self.size[0], self.pos[1]
+        Line:
+            points: self.pos[0], self.pos[1] + self.size[1], self.pos[0] + self.size[0], self.pos[1] + self.size[1]
+        Line:
+            ellipse: self.pos[0] - self.size[1]/2.0, self.pos[1], self.size[1], self.size[1], 180, 360
+        Line:
+            ellipse: self.size[0] + self.pos[0] - self.size[1]/2.0, self.pos[1], self.size[1], self.size[1], 360, 540

@@ -7,10 +7,13 @@ from kivy.uix.textinput import TextInput
 from kivy.uix.button import Button
 from kivy.uix.dropdown import DropDown
 from kivy.uix.anchorlayout import AnchorLayout
+from kivy.graphics import Color, Rectangle
 from kivy.uix.popup import Popup
 from kivy.clock import Clock
 from custom_button import CustomButton
 from custom_label import CustomLabel
+from custom_textinput import CustomTextInput
+from custom_popup import CustomPopup
 import re
 
 
@@ -18,7 +21,7 @@ class RegisterInfoWindow(Screen):
     def __init__(self,**kwargs):
         super(RegisterInfoWindow, self).__init__(**kwargs)
         self.name = "RegisterInfo"
-        self.popup = Popup(title='Oops !',content=Label(text='Hello world'),auto_dismiss=False,size_hint=(.8, .8))
+        self.popup = CustomPopup(title='Oops !',content=Label(text='Hello world'))
         self.popupIsOpen = False
         main_grid = BoxLayout(orientation="vertical",padding=[20,0,20,0])
         grid = GridLayout(cols=2,padding=[0,100,0,0],spacing=20,size_hint_y=10,col_force_default=True,col_default_width='500')      
@@ -27,7 +30,7 @@ class RegisterInfoWindow(Screen):
         firstNameGrid = GridLayout(cols=1)
         firstNameLabel = CustomLabel(text="First name :")
         anchor = AnchorLayout(size_hint_y=None,height=30)
-        self.firstNameInput=TextInput(multiline=False,size_hint_x=0.5)
+        self.firstNameInput=CustomTextInput()
         anchor.add_widget(self.firstNameInput)
         firstNameGrid.add_widget(firstNameLabel)
         firstNameGrid.add_widget(anchor)
@@ -37,7 +40,7 @@ class RegisterInfoWindow(Screen):
         lastNameGrid = GridLayout(cols=1)
         lastNameLabel = CustomLabel(text="Last name :")
         anchor = AnchorLayout(size_hint_y=None,height=30)
-        self.lastNameInput=TextInput(multiline=False,size_hint_x=0.5)
+        self.lastNameInput=CustomTextInput()
         anchor.add_widget(self.lastNameInput)
         lastNameGrid.add_widget(lastNameLabel)
         lastNameGrid.add_widget(anchor)
@@ -47,7 +50,7 @@ class RegisterInfoWindow(Screen):
         dobGrid = GridLayout(cols=1)
         dobLabel = CustomLabel(text="Date of birth :")
         anchor = AnchorLayout(size_hint_y=None,height=30)
-        self.dobInput=TextInput(multiline=False,size_hint_x=0.5)
+        self.dobInput=CustomTextInput()
         anchor.add_widget(self.dobInput)
         dobGrid.add_widget(dobLabel)
         dobGrid.add_widget(anchor)
@@ -57,7 +60,7 @@ class RegisterInfoWindow(Screen):
         telephoneGrid = GridLayout(cols=1)
         telephoneLabel = CustomLabel(text="Telephone :")
         anchor = AnchorLayout(size_hint_y=None,height=30)
-        self.telephoneInput=TextInput(multiline=False,size_hint_x=0.5)
+        self.telephoneInput=CustomTextInput()
         anchor.add_widget(self.telephoneInput)
         telephoneGrid.add_widget(telephoneLabel)
         telephoneGrid.add_widget(anchor)
@@ -67,7 +70,7 @@ class RegisterInfoWindow(Screen):
         emailGrid = GridLayout(cols=1)
         emailLabel = CustomLabel(text="Email :")
         anchor = AnchorLayout(size_hint_y=None,height=30)
-        self.emailInput=TextInput(multiline=False,size_hint_x=0.5)
+        self.emailInput=CustomTextInput()
         anchor.add_widget(self.emailInput)
         emailGrid.add_widget(emailLabel)
         emailGrid.add_widget(anchor)
@@ -77,17 +80,23 @@ class RegisterInfoWindow(Screen):
         beltGrid = GridLayout(cols=1)
         beltLabel = CustomLabel(text="Belt :")
         self.beltDropdown = DropDown()
+        self.beltDropdown.container.spacing = 10
+        self.beltDropdown.container.padding = [0,0,0,10]
+        with self.beltDropdown.container.canvas.before:
+            Color(1, 1, 1, 1) 
+            self.rect = Rectangle(size=self.beltDropdown.container.size,pos=self.beltDropdown.container.pos)
         ranks = ["white","blue","purple","brown","black"]
         for i in range(len(ranks)):
-            btn = Button(text=ranks[i], size_hint_y=None, height=44,on_release=lambda btn: self.beltDropdown.select(btn.text))
+            btn = CustomButton(text=ranks[i],height=30,on_release=lambda btn: self.beltDropdown.select(btn.text))
             self.beltDropdown.add_widget(btn)
             
-        anchor = AnchorLayout(size_hint_y=None,height=30)
-        self.beltButton = Button(text="Belt rank",size_hint_x=0.5,size_hint_y=None,height='48dp')
+        anchor = AnchorLayout(size_hint_x=1,size_hint_y=None,height=30,padding=[20,0,20,0])
+        self.beltButton = CustomButton(text="Select belt rank",size_hint_x=0.5,height=30)
         self.beltButton.bind(on_release=self.beltDropdown.open)
         self.beltDropdown.bind(on_select=lambda instance, x: setattr(self.beltButton, 'text', x))
+        anchor.add_widget(self.beltButton)
         beltGrid.add_widget(beltLabel)
-        beltGrid.add_widget(self.beltButton)
+        beltGrid.add_widget(anchor)
         grid.add_widget(beltGrid)
         
         button_grid = GridLayout(cols=2,spacing=20,size_hint_y=1)
