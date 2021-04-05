@@ -24,7 +24,7 @@ class RegisterInfoWindow(Screen):
         self.popup = CustomPopup(title='Oops !',content=Label(text='Hello world'))
         self.popupIsOpen = False
         main_grid = BoxLayout(orientation="vertical",padding=[20,0,20,0])
-        grid = GridLayout(cols=2,padding=[0,100,0,0],spacing=20,size_hint_y=10,col_force_default=True,col_default_width='500')      
+        grid = GridLayout(cols=2,padding=[0,100,0,0],spacing=20,size_hint_y=10,col_force_default=True,col_default_width='400')      
         
         #First name
         firstNameGrid = GridLayout(cols=1)
