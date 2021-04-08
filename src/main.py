@@ -1,3 +1,5 @@
+from kivy.config import Config
+Config.set('kivy', 'keyboard_mode', 'systemanddock')
 import os
 #os.environ['KIVY_AUDIO'] = 'sdl2'
 import kivy
@@ -11,6 +13,7 @@ from kivy.uix.textinput import TextInput
 from kivy.uix.image import Image
 from kivy.uix.popup import Popup
 from kivy.uix.button import Button
+from kivy.uix.vkeyboard import VKeyboard
 from kivy.uix.dropdown import DropDown
 from kivy.uix.scrollview import ScrollView
 from kivy.uix.widget import Widget
@@ -47,10 +50,17 @@ class Program(App):
         sm.add_widget(ProblemWindow())
         sm.add_widget(AlreadyMemberWindow())
         sm.add_widget(AlreadyMemberPhotoWindow(self.cam))
-        return sm  
+        return sm
+    
+#def get_vkeyboard():
+#    print("OK")
+#    return VKeyboard
 
 if __name__ == "__main__":
     Window.fullscreen = 'auto'
+    Window.size = (600,300)
+    #VKeyboard.setup_mode_dock()
+    #Window.set_vkeyboard_class(get_vkeyboard())
     Window.clearcolor = (1, 1, 1, 1)
     info.init()
     Program().run()
