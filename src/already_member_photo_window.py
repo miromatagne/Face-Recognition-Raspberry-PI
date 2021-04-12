@@ -19,7 +19,7 @@ from kivy.uix.button import Button
 import cv2
 import face_recognition
 import numpy as np
-from faces import find_encodings, get_matches, get_faces_frame
+from faces import get_matches, get_faces_frame
 from participant_list import add_user, write_new_id, get_sheet_content, write_presence, write_presence_from_name
 from database import post_to_db, get_documents
 from kivy.clock import Clock

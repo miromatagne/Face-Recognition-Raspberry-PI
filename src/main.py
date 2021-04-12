@@ -7,6 +7,9 @@ Config.set('kivy', 'keyboard_mode', 'systemanddock')
 import kivy
 import info
 from kivy.app import App
+from kivy.core.window import Window
+from kivy.uix.camera import Camera
+from kivy.uix.screenmanager import ScreenManager
 
 from main_window import MainWindow
 from register_info_window import RegisterInfoWindow

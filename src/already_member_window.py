@@ -26,7 +26,7 @@ class AlreadyMemberWindow(Screen):
     def __init__(self, **kwargs):
         super(AlreadyMemberWindow, self).__init__(**kwargs)
         self.name = "AlreadyMember"
-        self.grid = GridLayout(cols=1, padding=[20, 100, 20, 0])
+        self.grid = GridLayout(cols=1, padding=[20, 100, 20, 30])
 
         # Initialize the selected user/member to None
         self.selected_member = None

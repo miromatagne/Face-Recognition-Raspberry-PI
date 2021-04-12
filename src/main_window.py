@@ -30,7 +30,7 @@ class MainWindow(Screen):
     def __init__(self, cam, **kwargs):
         super(MainWindow, self).__init__(**kwargs)
         self.name = "Main"
-        grid = GridLayout(cols=1, spacing=20, padding=[20, 0, 20, 0])
+        grid = GridLayout(cols=1, spacing=20, padding=[20, 0, 20, 20])
 
         # Image containing live feed from the camera
         self.img = Image(size_hint_y=10)

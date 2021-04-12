@@ -35,7 +35,7 @@ class ProblemWindow(Screen):
         self.name = "Problem"
 
         box = BoxLayout(spacing=20, orientation="vertical",
-                        padding=[20, 0, 20, 0])
+                        padding=[20, 20, 20, 20])
         grid = GridLayout(cols=2, padding=[0, 100, 0, 0], size_hint_y=10)
 
         # First name

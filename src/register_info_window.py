@@ -16,6 +16,7 @@ from kivy.uix.button import Button
 from kivy.uix.dropdown import DropDown
 from kivy.uix.anchorlayout import AnchorLayout
 from kivy.graphics import Color, Rectangle
+from kivy.core.window import Window
 from kivy.uix.popup import Popup
 from kivy.clock import Clock
 from custom_button import CustomButton
@@ -35,9 +36,9 @@ class RegisterInfoWindow(Screen):
             title='Oops !', content=Label(text='Hello world'))
         self.popup_is_open = False
 
-        main_layout = BoxLayout(orientation="vertical", padding=[20, 0, 20, 0])
+        main_layout = BoxLayout(orientation="vertical", padding=[20, 20, 20, 20])
         grid = GridLayout(cols=2, padding=[
-                          0, 100, 0, 0], spacing=20, size_hint_y=10, col_force_default=True, col_default_width='400')
+                          0, 0, 0, 200], spacing=20, size_hint_y=10, col_force_default=True, col_default_width=Window.size[0]/2-20)
 
         # First name
         first_name_grid = GridLayout(cols=1)
