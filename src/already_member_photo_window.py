@@ -25,7 +25,7 @@ from database import post_to_db, get_documents
 from kivy.clock import Clock
 from kivy.graphics.texture import Texture
 from kivy.core.window import Window
-from custom_button import CustomButton
+from Components.custom_button import CustomButton
 import time
 import info
 

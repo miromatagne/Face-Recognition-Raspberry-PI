@@ -24,7 +24,7 @@ from participant_list import add_user, get_sheet_content, write_presence, write_
 import numpy as np
 import cv2
 import time
-from custom_button import CustomButton
+from Components.custom_button import CustomButton
 
 
 class RegisterPhotoWindow(Screen):

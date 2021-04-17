@@ -14,10 +14,10 @@ from kivy.uix.screenmanager import Screen
 from kivy.uix.scrollview import ScrollView
 from kivy.uix.anchorlayout import AnchorLayout
 from kivy.clock import Clock
-from custom_button import CustomButton
-from custom_textinput import CustomTextInput
-from custom_label import CustomLabel
-from custom_popup import CustomPopup
+from Components.custom_button import CustomButton
+from Components.custom_textinput import CustomTextInput
+from Components.custom_label import CustomLabel
+from Components.custom_popup import CustomPopup
 import time
 import info
 

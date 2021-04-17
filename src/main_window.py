@@ -7,8 +7,8 @@
 """
 
 import info
-from custom_popup import CustomPopup
-from custom_button import CustomButton
+from Components.custom_popup import CustomPopup
+from Components.custom_button import CustomButton
 from kivy.core.window import Window
 from kivy.graphics.texture import Texture
 from kivy.clock import Clock

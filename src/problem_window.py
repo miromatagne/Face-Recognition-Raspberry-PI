@@ -24,9 +24,9 @@ from kivy.uix.dropdown import DropDown
 from kivy.uix.scrollview import ScrollView
 from participant_list import write_presence_from_name
 from kivy.clock import Clock
-from custom_button import CustomButton
-from custom_label import CustomLabel
-from custom_textinput import CustomTextInput
+from Components.custom_button import CustomButton
+from Components.custom_label import CustomLabel
+from Components.custom_textinput import CustomTextInput
 
 
 class ProblemWindow(Screen):

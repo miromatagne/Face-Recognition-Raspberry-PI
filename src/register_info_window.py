@@ -19,10 +19,10 @@ from kivy.graphics import Color, Rectangle
 from kivy.core.window import Window
 from kivy.uix.popup import Popup
 from kivy.clock import Clock
-from custom_button import CustomButton
-from custom_label import CustomLabel
-from custom_textinput import CustomTextInput
-from custom_popup import CustomPopup
+from Components.custom_button import CustomButton
+from Components.custom_label import CustomLabel
+from Components.custom_textinput import CustomTextInput
+from Components.custom_popup import CustomPopup
 import re
 
 
@@ -36,7 +36,8 @@ class RegisterInfoWindow(Screen):
             title='Oops !', content=Label(text='Hello world'))
         self.popup_is_open = False
 
-        main_layout = BoxLayout(orientation="vertical", padding=[20, 20, 20, 20])
+        main_layout = BoxLayout(orientation="vertical",
+                                padding=[20, 20, 20, 20])
         grid = GridLayout(cols=2, padding=[
                           0, 0, 0, 200], spacing=20, size_hint_y=10, col_force_default=True, col_default_width=Window.size[0]/2-20)
 
