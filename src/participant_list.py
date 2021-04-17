@@ -6,10 +6,15 @@ from google.oauth2 import service_account
 from googleapiclient.discovery import build
 from datetime import datetime
 import info
+import os
 
 # Global variables allowing to identify the spreadsheet
 SCOPES = ['https://www.googleapis.com/auth/spreadsheets']
-SERVICE_ACCOUNT_FILE = '../keys.json'
+#SERVICE_ACCOUNT_FILE = os.getcwd() + 'keys.json'
+
+script_dir = os.path.dirname(__file__) #<-- absolute dir the script is in
+rel_path = "../keys.json"
+SERVICE_ACCOUNT_FILE = os.path.join(script_dir, rel_path)
 
 credentials = service_account.Credentials.from_service_account_file(
     SERVICE_ACCOUNT_FILE, scopes=SCOPES)
