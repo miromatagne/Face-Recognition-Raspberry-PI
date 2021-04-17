@@ -7,7 +7,7 @@ import kivy
 from kivy.uix.label import Label
 from kivy.lang import Builder
 
-Builder.load_file('custom_label.kv')
+Builder.load_file('Components/custom_label.kv')
 
 
 class CustomLabel(Label):
