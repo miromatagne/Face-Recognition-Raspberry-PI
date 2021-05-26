@@ -1,7 +1,8 @@
 """
     Main file, lauches the kivy application.
 """
-
+from kivy.config import Config
+Config.set('kivy', 'keyboard_mode', 'systemanddock')
 from Windows.problem_window import ProblemWindow
 from Windows.already_member_photo_window import AlreadyMemberPhotoWindow
 from Windows.already_member_window import AlreadyMemberWindow
@@ -10,12 +11,11 @@ from Windows.register_info_window import RegisterInfoWindow
 from Windows.main_window import MainWindow
 from kivy.uix.screenmanager import ScreenManager
 from kivy.uix.camera import Camera
+from kivy.uix.vkeyboard import VKeyboard
 from kivy.core.window import Window
 from kivy.app import App
 import info
 import kivy
-from kivy.config import Config
-Config.set('kivy', 'keyboard_mode', 'systemanddock')
 
 
 class Program(App):
