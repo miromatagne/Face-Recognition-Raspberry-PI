@@ -113,9 +113,10 @@ class AlreadyMemberWindow(Screen):
         user_exists = False
         # Check if user already exists in the database
         for db_user in info.users:
-            if db_user["_id"] == info.values[i][2]:
-                user_exists = True
-                break
+            if len(info.values[i]) > 2: 
+                if db_user["_id"] == info.values[i][2]:
+                    user_exists = True
+                    break
 
         # If user does not exists, navigate to next screen
         if not user_exists:

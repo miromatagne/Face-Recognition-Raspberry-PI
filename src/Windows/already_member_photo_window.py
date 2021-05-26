@@ -26,6 +26,7 @@ from kivy.clock import Clock
 from kivy.graphics.texture import Texture
 from kivy.core.window import Window
 from Components.custom_button import CustomButton
+from Components.custom_label import CustomLabel
 import time
 import info
 
@@ -41,10 +42,10 @@ class AlreadyMemberPhotoWindow(Screen):
         grid.add_widget(self.img)
 
         # Text indicating the user what to do
-        self.info_label = Label(
+        self.info_label = CustomLabel(
             text="Press the confirm button, a picture of you will be taken in 5 seconds. Make sure your face is clearly visible !")
         grid.add_widget(self.info_label)
-        subgrid = GridLayout(cols=3, size_hint_y=1)
+        subgrid = GridLayout(cols=3, size_hint_y=1.5,padding=[20, 0, 20, 40], spacing=20)
 
         # Buttons
         cancel_button = CustomButton(text="Cancel")
@@ -54,7 +55,7 @@ class AlreadyMemberPhotoWindow(Screen):
         photo_button.bind(on_press=self.start_capture)
 
         # Countdown text
-        self.countdown_text = Label(text="5")
+        self.countdown_text = CustomLabel(text="5")
 
         subgrid.add_widget(self.countdown_text)
         subgrid.add_widget(cancel_button)
@@ -86,8 +87,12 @@ class AlreadyMemberPhotoWindow(Screen):
             # A face was detected
             if(len(encodings) > 0):
                 self.info_label.text = "Your registration was successful, you will be redirected towards the main screen."
-                user = self.parent.get_screen("AlreadyMember").selectedMember
-
+                user = self.parent.get_screen("AlreadyMember").selected_member
+                
+                if len(user) < 10:
+                    for i in range(len(user),10):
+                        user.append("")
+                
                 # Update the database
                 user_id = post_to_db(
                     user[0], user[1], user[6], user[4], user[5], user[9], encodings[0].tolist())

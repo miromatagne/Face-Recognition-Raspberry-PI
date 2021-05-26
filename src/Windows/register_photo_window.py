@@ -25,6 +25,7 @@ import numpy as np
 import cv2
 import time
 from Components.custom_button import CustomButton
+from Components.custom_label import CustomLabel
 
 
 class RegisterPhotoWindow(Screen):
@@ -35,16 +36,16 @@ class RegisterPhotoWindow(Screen):
         grid = GridLayout(cols=1)
 
         # Image displaying the live feed from the camera
-        self.img = Image(size_hint_y=10)
+        self.img = Image(size_hint_y=9)
         grid.add_widget(self.img)
 
         # Label indicating the user what he should do
-        self.info_label = Label(
+        self.info_label = CustomLabel(
             text="Press the confirm button, a picture of you will be taken in 5 seconds. Make sure your face is clearly visible !")
         grid.add_widget(self.info_label)
 
         # Coundtown text and buttons
-        subgrid = GridLayout(cols=3, size_hint_y=1)
+        subgrid = GridLayout(cols=3, size_hint_y=1.5,padding=[20, 0, 20, 40], spacing=20)
         cancel_button = CustomButton(text="Cancel")
         cancel_button.bind(
             on_press=lambda x: self.switch_screen(self, "RegisterInfo"))
@@ -52,7 +53,7 @@ class RegisterPhotoWindow(Screen):
         photo_button.bind(on_press=self.start_capture)
 
         # Countdown starts at 5
-        self.countdown_text = Label(text="5")
+        self.countdown_text = CustomLabel(text="5")
         subgrid.add_widget(self.countdown_text)
         subgrid.add_widget(cancel_button)
         subgrid.add_widget(photo_button)
@@ -85,12 +86,12 @@ class RegisterPhotoWindow(Screen):
                 self.info_label.text = "Your registration was successful, you will be redirected towards the main screen."
 
                 # Update the database
-                new_user_id = post_to_db(self.parent.get_screen("RegisterInfo").firstNameInput.text, self.parent.get_screen("RegisterInfo").lastNameInput.text, self.parent.get_screen("RegisterInfo").dobInput.text, self.parent.get_screen(
-                    "RegisterInfo").telephoneInput.text, self.parent.get_screen("RegisterInfo").emailInput.text, self.parent.get_screen("RegisterInfo").beltButton.text, encodings[0].tolist())
+                new_user_id = post_to_db(self.parent.get_screen("RegisterInfo").first_name_input.text, self.parent.get_screen("RegisterInfo").last_name_input.text, self.parent.get_screen("RegisterInfo").dob_input.text, self.parent.get_screen(
+                    "RegisterInfo").telephone_input.text, self.parent.get_screen("RegisterInfo").email_input.text, self.parent.get_screen("RegisterInfo").belt_button.text, encodings[0].tolist())
 
                 # Update the spreashdeet
-                add_user(self.parent.get_screen("RegisterInfo").firstNameInput.text, self.parent.get_screen("RegisterInfo").lastNameInput.text, self.parent.get_screen("RegisterInfo").dobInput.text,
-                         self.parent.get_screen("RegisterInfo").telephoneInput.text, self.parent.get_screen("RegisterInfo").emailInput.text, self.parent.get_screen("RegisterInfo").beltButton.text, new_user_id)
+                add_user(self.parent.get_screen("RegisterInfo").first_name_input.text, self.parent.get_screen("RegisterInfo").last_name_input.text, self.parent.get_screen("RegisterInfo").dob_input.text,
+                         self.parent.get_screen("RegisterInfo").telephone_input.text, self.parent.get_screen("RegisterInfo").email_input.text, self.parent.get_screen("RegisterInfo").belt_button.text, new_user_id)
 
                 # Go back to main screen after 2 seconds
                 Clock.schedule_once(
